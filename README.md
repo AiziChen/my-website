@@ -3,6 +3,6 @@
 this project is based on `racket`'s webserver.
 
 
-## I. Function list
+## I. Functions list
 
 1. blog
