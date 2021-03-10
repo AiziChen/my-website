@@ -5,14 +5,17 @@
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<meta charset="utf-8" />
 	@(xexpr->string top-style-sheet)
+	<link ref="stylesheet" href="/blog.css" type="text/css"/>
     </head>
     <body>
 	<h1>My Blog</h1>
-	<div>
-	  @(xexpr->string (render-posts a-blog embed/url))
+	<div class="posts">
+	    @in[a-post (blog-posts a-blog)]{
+	    @(render-post a-blog a-post embed/url)
+	    }
 	</div>
 	<h4>New Post Here:</h4>
-	<form action="@(embed/url insert-post-handler)">
+	<form action="@(embed/url insert-post-handler)" method="post">
 	    <input name="title" type="text" value="" placeholder="title" />
 	    <input name="body" type="text" value="" placeholder="body" />
 	    <input name="" type="submit" value="Submit"/>

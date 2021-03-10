@@ -13,7 +13,7 @@
 
 (define top-style-sheet
   `(link ([rel "stylesheet"]
-          [href "/main.css"]
+          [href "/top.css"]
           [type "text/css"])))
 
 
@@ -24,19 +24,7 @@
 (define (render-post a-blog a-post embed/url)
   (define (view-post-handler request)
     (render-post-detail-page a-blog a-post request))
-  `(div ([class "post"])
-        (a ([method "post"]
-            [href ,(embed/url view-post-handler)])
-           ,(post-title a-post))
-        (p ,(post-body a-post))
-        (div ,(number->string (length (post-comments a-post)))
-             " comment(s)")))
-
-(define (render-posts a-blog embed/url)
-  `(div ([class "posts"])
-        ,@(map (lambda (a-post)
-                 (render-post a-blog a-post embed/url))
-               (blog-posts a-blog))))
+  (include-template "templates/blog.post-item.html"))
 
 
 ;; Entry Servlet For The Server
@@ -46,6 +34,7 @@
    request))
 
 
+#;
 (define (can-parse-post? bindings)
   (and (exists-binding? 'title bindings)
        (exists-binding? 'body bindings)))
@@ -55,7 +44,7 @@
 (define (render-blog-page a-blog request)
   (define (response-generator embed/url)
     (response/template (include-template "templates/blog.html")))
-
+  
   (define (insert-post-handler request)
     (let* ([bindings (request-bindings request)]
            [title (extract-binding/single 'title bindings)]
