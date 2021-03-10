@@ -3,12 +3,15 @@
 (require web-server/servlet
          web-server/servlet-env
          web-server/formlets
-         "model.rkt")
+         web-server/templates
+         xml
+         "model.rkt"
+         "web-tools.rkt")
 
 (provide/contract (start (request? . -> . response?)))
 
 
-(define main-style-sheet
+(define top-style-sheet
   `(link ([rel "stylesheet"]
           [href "/main.css"]
           [type "text/css"])))
@@ -51,38 +54,14 @@
 ;; Render Blog Page
 (define (render-blog-page a-blog request)
   (define (response-generator embed/url)
-    (response/xexpr
-     `(html (head (title "My Blog") ,main-style-sheet)
-            (body (h1 "My Blog")
-                  ,(render-posts a-blog embed/url)
-                  (br)
-                  (h4 "New Post Here:")
-                  (form ([action ,(embed/url insert-post-handler)]
-                         [method "post"])
-                        ,@(formlet-display new-post-formlet)
-                        (input ([type "submit"] [value "Submit"])))))))
-  
-  (define new-post-formlet
-    (formlet
-     (#%# ,((to-string
-             (required
-              (text-input
-               #:attributes '([class "form-text"]
-                              [placeholder "title"]))))
-            . => . title)
-          ,((to-string
-             (required
-              (text-input
-               #:attributes '([class "form-text"]
-                              [placeholder "content"]))))
-            . => . body))
-     (values title body)))
-  
+    (response/template (include-template "templates/blog.html")))
+
   (define (insert-post-handler request)
-    (define-values (title body)
-      (formlet-process new-post-formlet request))
-    (blog-insert-post! a-blog title body)
-    (render-blog-page a-blog (redirect/get)))
+    (let* ([bindings (request-bindings request)]
+           [title (extract-binding/single 'title bindings)]
+           [body (extract-binding/single 'body bindings)])
+      (blog-insert-post! a-blog title body)
+      (render-blog-page a-blog (redirect/get))))
   
   (send/suspend/dispatch response-generator))
 
@@ -90,32 +69,16 @@
 ;; Render Post Details
 (define (render-post-detail-page a-blog a-post request)
   (define (response-generator embed/url)
-    (response/xexpr
-     `(html (head (title "Post Details") ,main-style-sheet)
-            (body
-             (h1 "Post Details")
-             (h2 ,(post-title a-post))
-             (p ,(post-body a-post))
-             ,(render-as-itemized-list (post-comments a-post))
-             (form ([method "post"]
-                    [action ,(embed/url insert-comment-handler)])
-                   ,@(formlet-display new-comment-formlet)
-                   (input ([type "submit"] [value "Submit"])))
-             (br)
-             (a ([href ,(embed/url goback-handler)])
-                "Back")))))
-  
-  (define new-comment-formlet
-    (formlet
-     (#%# ,(input-string . => . comment))
-     (values comment)))
+    (response/template (include-template "templates/post-detail.html")))
   
   (define (insert-comment-handler request)
-    (render-confirm-add-comment-page
-     a-blog
-     (formlet-process new-comment-formlet request)
-     a-post
-     request))
+    (let* ([bindings (request-bindings request)]
+           [comment (extract-binding/single 'comment bindings)])
+      (render-confirm-add-comment-page
+       a-blog
+       comment
+       a-post
+       request)))
   
   (define (goback-handler request)
     (render-blog-page a-blog (redirect/get)))
@@ -126,19 +89,7 @@
 ;; Blog Comment Add Confirm
 (define (render-confirm-add-comment-page a-blog a-comment a-post request)
   (define (response-generator embed/url)
-    (response/xexpr
-     `(html (head (title "Add a Comment") ,main-style-sheet)
-            (body
-             (h1 "Add a Comment")
-             "The comment: " (div (p ,a-comment))
-             "will be added to "
-             (div ,(post-title a-post))
-             (p (a ([method "post"]
-                    [href ,(embed/url yes-handler)])
-                   "Yes, add the comment."))
-             (p (a ([method "post"]
-                    [href ,(embed/url cancel-handler)])
-                   "No, I changed my mind."))))))
+    (response/template (include-template "templates/confirm-add-comment.html")))
   
   (define (yes-handler request)
     (post-insert-comment! a-blog a-post a-comment)
@@ -159,4 +110,5 @@
                #:servlet-path "/"
                #:extra-files-paths (list (build-path "htdocs"))
                #:command-line? #t
-	       #:ssl? #f)
+	       #:ssl? #f
+	       #:stateless? #f)

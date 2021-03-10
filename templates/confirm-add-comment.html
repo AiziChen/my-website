@@ -1,0 +1,24 @@
+<!doctype html>
+<html>
+    <head>
+	<title>Add a Comment</title>
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<meta charset="utf-8" />
+	@(xexpr->string top-style-sheet)
+    </head>
+    <body>
+	<h1>Add a Comment</h1>
+	<p>
+	    The Comment:
+	    <div><p>@|a-comment|</p></div>
+	</p>
+	will added to
+	<div>@(post-title a-post)</div>
+	<p>
+	    <a href="@(embed/url yes-handler)">Yes, add the comment.</a>
+	</p>
+	<p>
+	    <a href="@(embed/url cancel-handler)">No, I changed my mind.</a>
+	</p>
+    </body>
+</html>

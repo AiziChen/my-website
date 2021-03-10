@@ -1,0 +1,21 @@
+<!doctype html>
+<html>
+    <head>
+	<title>My Blog</title>
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<meta charset="utf-8" />
+	@(xexpr->string top-style-sheet)
+    </head>
+    <body>
+	<h1>My Blog</h1>
+	<div>
+	  @(xexpr->string (render-posts a-blog embed/url))
+	</div>
+	<h4>New Post Here:</h4>
+	<form action="@(embed/url insert-post-handler)">
+	    <input name="title" type="text" value="" placeholder="title" />
+	    <input name="body" type="text" value="" placeholder="body" />
+	    <input name="" type="submit" value="Submit"/>
+	</form>
+    </body>
+</html>
