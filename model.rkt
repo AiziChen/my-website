@@ -30,7 +30,10 @@
                (post-id a-post)))
 
 (define (initialize-blog! home)
-  (define db (sqlite3-connect #:database home #:mode 'create))
+  (define db (virtual-connection
+	      (connection-pool
+	       (lambda ()
+		 (sqlite3-connect #:database home #:mode 'create)))))
   (define the-blog (blog db))
   (unless (table-exists? db "posts")
     (query-exec db
