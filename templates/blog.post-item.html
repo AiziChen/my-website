@@ -1,4 +1,4 @@
 <div class="post">
-  <a href="@(embed/url view-post-handler)">@(post-title a-post)</a>
-  <div>@(number->string (length (post-comments a-post))) comment(s)</div>
+  <a href="@(embed/url view-post-handler)">@(post-title a-blog a-post)</a>
+  <div>@(number->string (length (post-comments a-blog a-post))) comment(s)</div>
 </div>

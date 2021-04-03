@@ -10,11 +10,14 @@
 
 (provide/contract (start (request? . -> . response?)))
 
-
+;;; VARS
 (define top-style-sheet
   `(link ([rel "stylesheet"]
           [href "/top.css"]
           [type "text/css"])))
+
+;;; INITIALIZE
+(initialize-blog!)
 
 
 (define (render-as-itemized-list l)
@@ -29,10 +32,7 @@
 
 ;; Entry Servlet For The Server
 (define (start request)
-  (render-blog-page
-   (initialize-blog! (build-path (current-directory) "the-blog-data.db"))
-   request))
-
+  (render-blog-page get-new-blog-db request))
 
 #;
 (define (can-parse-post? bindings)
