@@ -65,7 +65,7 @@
     (let* ([bindings (request-bindings request)]
            [comment (extract-binding/single 'comment bindings)])
       (cond
-       [(string=? comment "")
+       [(empty-string? comment)
 	(occur-error-page "Empty Comment"
 			  "You should specify the comment content."
 			  (lambda (request)
