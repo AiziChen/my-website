@@ -5,8 +5,9 @@
          web-server/formlets
          web-server/templates
          xml
-         "model.rkt"
-         "web-tools.rkt")
+	 "top-tools.rkt"
+ 	 "web-tools.rkt"
+         "model.rkt")
 
 (provide/contract (start (request? . -> . response?)))
 
@@ -20,10 +21,6 @@
 (initialize-blog!)
 
 
-(define (render-as-itemized-list l)
-  `(ul ,@(map (lambda (e) `(li ,e)) l)))
-
-
 (define (render-post a-blog a-post embed/url)
   (define (view-post-handler request)
     (render-post-detail-page a-blog a-post request))
@@ -33,11 +30,6 @@
 ;; Entry Servlet For The Server
 (define (start request)
   (render-blog-page get-new-blog-db request))
-
-#;
-(define (can-parse-post? bindings)
-  (and (exists-binding? 'title bindings)
-       (exists-binding? 'body bindings)))
 
 
 ;; Render Blog Page
@@ -49,8 +41,17 @@
     (let* ([bindings (request-bindings request)]
            [title (extract-binding/single 'title bindings)]
            [body (extract-binding/single 'body bindings)])
-      (blog-insert-post! a-blog title body)
-      (render-blog-page a-blog (redirect/get))))
+      (cond
+       [(or (empty-string? title)
+	    (empty-string? body))
+	(occur-error-page "Empty Blog"
+			  "The blog title & body must be specifed."
+			  (lambda (request)
+			    (render-blog-page a-blog (redirect/get)))
+			  request)]
+       [else
+	(blog-insert-post! a-blog title body)
+	(render-blog-page a-blog (redirect/get))])))
   
   (send/suspend/dispatch response-generator))
 
@@ -63,11 +64,19 @@
   (define (insert-comment-handler request)
     (let* ([bindings (request-bindings request)]
            [comment (extract-binding/single 'comment bindings)])
-      (render-confirm-add-comment-page
-       a-blog
-       comment
-       a-post
-       request)))
+      (cond
+       [(string=? comment "")
+	(occur-error-page "Empty Comment"
+			  "You should specify the comment content."
+			  (lambda (request)
+			    (render-post-detail-page a-blog a-post (redirect/get)))
+			  request)]
+       [else
+	(render-confirm-add-comment-page
+	      a-blog
+	      comment
+	      a-post
+	      request)])))
   
   (define (goback-handler request)
     (render-blog-page a-blog (redirect/get)))
@@ -86,6 +95,15 @@
   
   (define (cancel-handler request)
     (render-post-detail-page a-blog a-post (redirect/get)))
+  
+  (send/suspend/dispatch response-generator))
+
+;;; Error Ocurred Page
+(define (occur-error-page title message p request)
+  (define (response-generator embed/url)
+    (response/template (include-template "templates/error.html")))
+  
+  (define (back-handler request) (p request))
   
   (send/suspend/dispatch response-generator))
 
