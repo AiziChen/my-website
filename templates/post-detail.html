@@ -8,9 +8,12 @@
 	@(xexpr->string top-style-sheet)
     </head>
     <body>
-	<h2>@(post-title a-blog a-post)</h2>
+        <h2>@(post-title a-blog a-post)</h2>
+      	<hr/>
 	<!--post body-->
 	<p>@(post-body a-blog a-post)</p>
+	<br/>
+	<hr/>
 	<!--comments-->
 	<h4>Comments</h4>
 	@(xexpr->string (render-as-itemized-list (post-comments a-blog a-post)))

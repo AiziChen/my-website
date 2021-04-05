@@ -1,6 +1,10 @@
 body {
     margin-left: 10%;
     margin-right: 10%;
+    border: 1px solid black;
+    padding-left: 6%;
+    padding-right: 6%;
+    padding-top: 4%;
 }
 
 p { font-family: sans-serif }
@@ -9,7 +13,7 @@ span.hot { color: red }
 
 div.post-link {
     color: #2f2fff;
-    font-size: 1.1em;
+    font-size: 100%;
 }
 div.post-link:hover {
     text-decoration: underline;
@@ -17,5 +21,6 @@ div.post-link:hover {
 
 div.post-comment-sum {
     color: gray;
+    font-size: 80%;
 }
 
