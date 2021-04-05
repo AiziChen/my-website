@@ -22,7 +22,7 @@
   (map (lambda (id)
 	 (post blog-db id))
        (query-list blog-db
-		   "SELECT id FROM posts WHERE id BETWEEN ? AND ?"
+		   "SELECT id FROM posts WHERE id BETWEEN ? AND ? ORDER BY id DESC"
 		   (* each (- page 1))
 		   (* each page))))
 (define (post-title blog-db a-post)
