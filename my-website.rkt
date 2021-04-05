@@ -16,6 +16,14 @@
   `(link ([rel "stylesheet"]
           [href "/top.css"]
           [type "text/css"])))
+(define bootstrap-style-sheet
+  `(link ([rel "stylesheet"]
+          [href "/bootstrap/bootstrap.min.css"]
+          [type "text/css"])))
+(define bootstrap-js
+  `(script ([type "text/javascript"]
+	    [src "/bootstrap/bootstrap.min.js"]
+	    [crossorigin "anonymouse"])))
 
 ;;; INITIALIZE
 (initialize-blog!)

@@ -4,19 +4,32 @@
 	<title>Post Details</title>
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<meta charset="utf-8" />
+	@(xexpr->string bootstrap-style-sheet)
 	@(xexpr->string top-style-sheet)
     </head>
     <body>
-	<h1>Post Details</h1>
 	<h2>@(post-title a-blog a-post)</h2>
+	<!--post body-->
 	<p>@(post-body a-blog a-post)</p>
+	<!--comments-->
+	<h4>Comments</h4>
 	@(xexpr->string (render-as-itemized-list (post-comments a-blog a-post)))
+
+	<hr/>
+	<h4>New Comment Here:</h4>
 	<form action="@(embed/url insert-comment-handler)" method="post">
-	    <input name="comment" type="text" value=""/>
-	    <input name="" type="submit" value="Submit"/>
+	  <textarea name="comment" type="text" placeholder="comment"
+		    class="form-control" cols="33" rows="3"></textarea>
+	  <br/>
+          <input type="submit" value="Submit" class="btn btn-primary"/>
 	</form>
+
+	<hr/>
 	<div>
-	    <a href="@(embed/url goback-handler)">Back</a>
+	  <a href="@(embed/url goback-handler)"
+	     class="btn btn-link">Back</a>
 	</div>
+	
+	@(xexpr->string bootstrap-js)
     </body>
 </html>

@@ -1,4 +1,14 @@
-<div class="post">
-  <a href="@(embed/url view-post-handler)">@(post-title a-blog a-post)</a>
-  <div>@(number->string (length (post-comments a-blog a-post))) comment(s)</div>
-</div>
+<a href="@(embed/url view-post-handler)"
+   class="post list-group-item list-group-item-action">
+  <div class="post-link" >
+    @(post-title a-blog a-post)
+  </div>
+  <div class="post-comment-sum">
+      @(let ([len (length (post-comments a-blog a-post))])
+         (string-append
+       (number->string len)
+       (if (> len 1)
+           " comments"
+           " comment")))
+  </div>
+</a>

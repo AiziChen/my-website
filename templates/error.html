@@ -5,6 +5,7 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Error Ocurred</title>
+    @(xexpr->string bootstrap-style-sheet)
     @(xexpr->string top-style-sheet)
 </head>
 <body>
@@ -12,8 +13,13 @@
     <div>
 	<p>@|message|</p>
     </div>
+
+    <hr/>
     <div>
-	<a href="@(embed/url back-handler)">Go Back</a>
+      <a href="@(embed/url back-handler)"
+	 class="btn btn-link">Go Back</a>
     </div>
+    
+    @(xexpr->string bootstrap-js)
 </body>
 </html>

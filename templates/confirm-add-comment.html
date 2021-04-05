@@ -4,6 +4,7 @@
 	<title>Add a Comment</title>
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<meta charset="utf-8" />
+	@(xexpr->string bootstrap-style-sheet)
 	@(xexpr->string top-style-sheet)
     </head>
     <body>
@@ -13,12 +14,18 @@
 	    <div><p>@|a-comment|</p></div>
 	</p>
 	will added to
-	<div>@(post-title a-blog a-post)</div>
+	<h4>@(post-title a-blog a-post)</h4>
+
+	<hr/>
 	<p>
-	    <a href="@(embed/url yes-handler)">Yes, add the comment.</a>
+	  <a href="@(embed/url yes-handler)"
+	     class="btn btn-link">Yes, add the comment.</a>
 	</p>
 	<p>
-	    <a href="@(embed/url cancel-handler)">No, I changed my mind.</a>
+	  <a href="@(embed/url cancel-handler)"
+	     class="btn btn-link">No, I changed my mind.</a>
 	</p>
+
+	@(xexpr->string bootstrap-js)
     </body>
 </html>

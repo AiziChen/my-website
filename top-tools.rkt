@@ -6,7 +6,11 @@
 	 empty-string?)
 
 (define (render-as-itemized-list l)
-  `(url ,@(map (lambda (e) `(li ,e)) l)))
+  `(ol ([class "list-group list-group-numbered"])
+       ,@(map
+	  (lambda (e)
+	    `(li ([class "list-group-item"]) ,e))
+	  l)))
 
 (define (can-parse-post? bindings)
   (and (exists-binding? 'title bindings)
