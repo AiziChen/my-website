@@ -1,6 +1,11 @@
+@media only screen and (min-width: 1080px) {
+    body {
+	margin-left: 10%;
+	margin-right: 10%;
+    }
+}
+
 body {
-    margin-left: 10%;
-    margin-right: 10%;
     border: 1px solid black;
     padding-left: 6%;
     padding-right: 6%;
