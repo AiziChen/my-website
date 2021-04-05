@@ -11,7 +11,7 @@
 	<h1>My Blog</h1>
 	<div class="posts list-group">
 	    @in[a-post (blog-posts a-blog)]{
-	    @(render-post a-blog a-post embed/url)
+	    	@(render-post a-blog a-post embed/url)
 	    }
 	</div>
 	
@@ -24,7 +24,7 @@
 		    class="form-control"></textarea>
 	  <br/>
 	  <input type="submit" value="Submit"
-		 class="btn btn-primary"/>
+	  	class="btn btn-primary"/>
 	</form>
 
 	@(xexpr->string bootstrap-js)

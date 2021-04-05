@@ -4,7 +4,7 @@
     @(post-title a-blog a-post)
   </div>
   <div class="post-comment-sum">
-      @(let ([len (length (post-comments a-blog a-post))])
+      @(let ([len (post-comments-count a-blog a-post)])
          (string-append
        (number->string len)
        (if (> len 1)

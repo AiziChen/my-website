@@ -3,7 +3,7 @@
          db)
 
 (provide blog-posts
-         post? post-title post-body post-comments
+         post? post-title post-body post-comments post-comments-count
          initialize-blog! get-new-blog-db
          blog-insert-post! post-insert-comment!)
 
@@ -17,7 +17,14 @@
   (map (lambda (id)
          (post blog-db id))
        (query-list blog-db
-                   "SELECT id FROM posts")))
+                   "SELECT id FROM posts ORDER BY id DESC")))
+(define (blog-posts-in-page blog-db page #:each [each 10])
+  (map (lambda (id)
+	 (post blog-db id))
+       (query-list blog-db
+		   "SELECT id FROM posts WHERE id BETWEEN ? AND ?"
+		   (* each (- page 1))
+		   (* each page))))
 (define (post-title blog-db a-post)
   (query-value blog-db
                "SELECT title FROM posts WHERE id = ?"
@@ -30,6 +37,10 @@
   (query-list blog-db
               "SELECT content FROM comments WHERE pid = ?"
               (post-id a-post)))
+(define (post-comments-count blog-db a-post)
+  (query-value blog-db
+	       "SELECT COUNT(*) FROM comments WHERE pid = ?"
+	       (post-id a-post)))
 
 (define (initialize-blog!)
   (define db get-new-blog-db)

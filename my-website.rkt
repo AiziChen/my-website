@@ -2,11 +2,10 @@
 
 (require web-server/servlet
          web-server/servlet-env
-         web-server/formlets
          web-server/templates
          xml
-	 "top-tools.rkt"
- 	 "web-tools.rkt"
+         "top-tools.rkt"
+         "web-tools.rkt"
          "model.rkt")
 
 (provide/contract (start (request? . -> . response?)))
@@ -22,8 +21,8 @@
           [type "text/css"])))
 (define bootstrap-js
   `(script ([type "text/javascript"]
-	    [src "/bootstrap/bootstrap.min.js"]
-	    [crossorigin "anonymouse"])))
+            [src "/bootstrap/bootstrap.min.js"]
+            [crossorigin "anonymouse"])))
 
 ;;; INITIALIZE
 (initialize-blog!)
@@ -50,16 +49,16 @@
            [title (extract-binding/single 'title bindings)]
            [body (extract-binding/single 'body bindings)])
       (cond
-       [(or (empty-string? title)
-	    (empty-string? body))
-	(occur-error-page "Empty Blog"
-			  "The blog title & body must be specifed."
-			  (lambda (request)
-			    (render-blog-page a-blog (redirect/get)))
-			  request)]
-       [else
-	(blog-insert-post! a-blog title body)
-	(render-blog-page a-blog (redirect/get))])))
+        [(and (valid-string? title)
+              (valid-string? body))
+         (blog-insert-post! a-blog title body)
+         (render-blog-page a-blog (redirect/get))]
+        [else
+         (occur-error-page "Empty Blog"
+                           "The blog title & body must be specifed."
+                           (lambda (request)
+                             (render-blog-page a-blog (redirect/get)))
+                           request)])))
   
   (send/suspend/dispatch response-generator))
 
@@ -73,18 +72,18 @@
     (let* ([bindings (request-bindings request)]
            [comment (extract-binding/single 'comment bindings)])
       (cond
-       [(empty-string? comment)
-	(occur-error-page "Empty Comment"
-			  "You should specify the comment content."
-			  (lambda (request)
-			    (render-post-detail-page a-blog a-post (redirect/get)))
-			  request)]
-       [else
-	(render-confirm-add-comment-page
-	      a-blog
-	      comment
-	      a-post
-	      request)])))
+        [(valid-string? comment)
+         (render-confirm-add-comment-page
+          a-blog
+          comment
+          a-post
+          request)]
+        [else
+         (occur-error-page "Empty Comment"
+                           "You should specify the comment content."
+                           (lambda (request)
+                             (render-post-detail-page a-blog a-post (redirect/get)))
+                           request)])))
   
   (define (goback-handler request)
     (render-blog-page a-blog (redirect/get)))
@@ -125,5 +124,5 @@
                #:servlet-path "/"
                #:extra-files-paths (list (build-path "htdocs"))
                #:command-line? #t
-	       #:ssl? #f
-	       #:stateless? #f)
+               #:ssl? #f
+               #:stateless? #f)
