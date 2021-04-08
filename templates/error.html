@@ -8,7 +8,7 @@
     @(xexpr->string bootstrap-style-sheet)
     @(xexpr->string top-style-sheet)
 </head>
-<body>
+<body align="center">
     <h1 style="color: red;">@|title|</h1>
     <div>
 	<p>@|message|</p>
@@ -16,10 +16,9 @@
 
     <hr/>
     <div>
-      <a href="@(embed/url back-handler)"
-	 class="btn btn-link">Go Back</a>
+	<a href="@(embed/url back-handler)"
+	   class="btn btn-link">Go Back</a>
     </div>
-    
     @(xexpr->string bootstrap-js)
 </body>
 </html>
