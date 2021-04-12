@@ -9,3 +9,5 @@ compiled/**
 **.db
 **.db3
 **.log
+**.swap
+**.swp
