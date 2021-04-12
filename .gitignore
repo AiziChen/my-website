@@ -6,6 +6,6 @@ compiled/**
 #*#
 *~
 
-*.db
-*.db3
-
+**.db
+**.db3
+**.log

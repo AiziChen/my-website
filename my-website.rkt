@@ -27,4 +27,5 @@
 	       (gen-file-not-found-responder
 		(build-path "templates/not-found.html"))
                #:ssl? #f
-               #:stateless? #f)
+               #:stateless? #f
+	       #:log-file "my-website.log")
