@@ -17,6 +17,9 @@ body {
 }
 
 p { font-family: sans-serif }
+p.content {
+    white-space: pre;
+}
 h1 { color: #2f2f2f }
 span.hot { color: red }
 
