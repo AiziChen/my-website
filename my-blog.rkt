@@ -9,20 +9,6 @@
 
 (provide blog-entry)
 
-;;; VARS
-(define top-style-sheet
-  `(link ([rel "stylesheet"]
-          [href "/top.css"]
-          [type "text/css"])))
-(define bootstrap-style-sheet
-  `(link ([rel "stylesheet"]
-          [href "/bootstrap/bootstrap.min.css"]
-          [type "text/css"])))
-(define bootstrap-js
-  `(script ([type "text/javascript"]
-            [src "/bootstrap/bootstrap.min.js"]
-            [crossorigin "anonymouse"])))
-
 ;;; INITIALIZE
 (initialize-blog!)
 
@@ -31,6 +17,13 @@
   (define (view-post-handler request)
     (render-post-detail-page a-blog a-post request))
   (include-template "templates/blog.post-item.html"))
+
+
+(define navs
+  (list
+   (nav "主页" "/" #f)
+   (nav "歌单" "/song-list" #f)
+   (nav "博客" "/blog" #t)))
 
 
 ;; Entry Servlet For The Server
@@ -72,11 +65,10 @@
            [comment (extract-binding/single 'comment bindings)])
       (cond
         [(valid-string? comment)
-         (render-confirm-add-comment-page
-          a-blog
-          comment
-          a-post
-          request)]
+         (render-confirm-add-comment-page a-blog
+					  comment
+					  a-post
+					  request)]
         [else
          (occur-error-page "Empty Comment"
                            "You should specify the comment content."

@@ -2,8 +2,7 @@
 
 (require web-server/servlet)
 
-(provide render-as-itemized-list
-	 empty-string?)
+(provide render-as-itemized-list)
 
 (define (render-as-itemized-list l)
   `(ol ([class "list-group list-group-numbered"])
@@ -16,5 +15,3 @@
   (and (exists-binding? 'title bindings)
        (exists-binding? 'body bindings)))
 
-(define (empty-string? s)
-  (string=? (string-trim s) ""))

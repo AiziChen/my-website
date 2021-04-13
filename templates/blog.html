@@ -8,7 +8,8 @@
 	@(xexpr->string top-style-sheet)
     </head>
     <body>
-	<h1>My Blog</h1>
+      	<!-- TOP NAV BAR -->
+	@(top-nav-bar navs)
 	<div class="posts list-group">
 	    @in[a-post (blog-posts a-blog)]{
 	    	@(render-post a-blog a-post embed/url)

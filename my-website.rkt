@@ -3,6 +3,7 @@
 (require web-server/servlet-env
 	 web-server/dispatch
 	 web-server/configuration/responders
+	 "my-home.rkt"
 	 "my-blog.rkt")
 
 
@@ -10,19 +11,22 @@
 (define-values (website-dispatch blog-url)
   (dispatch-rules
    ;; BLOG
-   [("") (lambda (req)
-	   (blog-entry req))]))
+   [("")
+    (lambda (req)
+      (home-entry req))]
+   [("blog")
+    (lambda (req)
+      (blog-entry req))]))
 
 
 ;; Setup The Servlet
 (serve/servlet website-dispatch
-               #:launch-browser? #f
+               #:command-line? #t
                #:listen-ip #f
                #:port 80
-               #:quit? #f
                #:servlet-path "/"
+	       #:servlet-regexp #rx""
                #:extra-files-paths (list (build-path "htdocs"))
-               #:command-line? #t
 	       #:file-not-found-responder
 	       (gen-file-not-found-responder
 		(build-path "templates/not-found.html"))

@@ -6,19 +6,18 @@
 }
 
 body {
-    margin-top:2px;
-    margin-bottom:2px;
+    margin:2px;
     border: 1px solid black;
     border-radius: 4px;
     padding-left: 6%;
     padding-right: 6%;
-    padding-top: 4%;
-    padding-bottom: 4%;
+    padding-top: 2%;
+    padding-bottom: 2%;
 }
 
 p { font-family: sans-serif }
 p.content {
-    white-space: pre;
+    white-space: pre-line;
 }
 h1 { color: #2f2f2f }
 span.hot { color: red }
@@ -34,4 +33,19 @@ div.post-link:hover {
 div.post-comment-sum {
     color: gray;
     font-size: 80%;
+}
+
+/* top-nav-bar */
+ul.nav.nav-pills {
+    box-shadow: -2px -1px 2px 1px rgba(0, 0, 255, .2);
+    border: 2px solid #2af;
+    border-radius: 2px;
+    padding-left: 20px;
+    padding-right: 20px;
+    padding-top: 4px;
+    padding-bottom: 4px;
+}
+.nav-pills .nav-link.active, .nav-pills .show>.nav-link {
+    color: #fff;
+    background-color: #666;
 }
