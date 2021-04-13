@@ -37,7 +37,7 @@ div.post-comment-sum {
 
 /* top-nav-bar */
 ul.nav.nav-pills {
-    box-shadow: -2px -1px 2px 1px rgba(0, 0, 255, .2);
+    box-shadow: -2px -1px 2px 1px rgba(46, 125, 255, 0.18);
     border: 2px solid #2af;
     border-radius: 2px;
     padding-left: 20px;
