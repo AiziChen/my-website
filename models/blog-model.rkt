@@ -10,6 +10,7 @@
 ;;; BLOG DB PATH
 (define BLOG-DB-HOME (build-path (current-directory) "the-blog-data.db"))
 
+;;; BLOG MODEL
 ;;; STRUCTS
 (struct post (blog id))
 
@@ -48,7 +49,8 @@
     (query-exec db
                 (string-append
                  "CREATE TABLE posts "
-                 "(id INTEGER PRIMARY KEY, title TEXT, body TEXT)"))
+                 "(id INTEGER PRIMARY KEY, title TEXT, body TEXT"
+                 ", DATETIME created_at, DATETIME updated_at)"))
     (blog-insert-post!
      db "First Post" "This is my first post.")
     (blog-insert-post!

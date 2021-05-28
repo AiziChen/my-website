@@ -1,2 +1,2 @@
 #!/bin/sh
-racket -t my-website.rkt
+nohup racket -t my-website.rkt > /dev/null

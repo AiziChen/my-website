@@ -1,22 +1,22 @@
-#lang racket
+#lang racket/base
 
 (require web-server/servlet-env
-	 web-server/dispatch
-	 web-server/configuration/responders
-	 "my-home.rkt"
-	 "my-blog.rkt")
+         web-server/dispatch
+         web-server/configuration/responders
+         "pages/my-home.rkt"
+         "pages/my-blog.rkt"
+         "pages/my-songlist.rkt")
 
 
 ;;; Dispatches
 (define-values (website-dispatch blog-url)
   (dispatch-rules
+   ;; HOME
+   [("") home-entry]
    ;; BLOG
-   [("")
-    (lambda (req)
-      (home-entry req))]
-   [("blog")
-    (lambda (req)
-      (blog-entry req))]))
+   [("blog") blog-entry]
+   ;; SONG LIST
+   [("song-list") song-list]))
 
 
 ;; Setup The Servlet
@@ -25,11 +25,8 @@
                #:listen-ip #f
                #:port 80
                #:servlet-path "/"
-	       #:servlet-regexp #rx""
+               #:servlet-regexp #rx""
                #:extra-files-paths (list (build-path "htdocs"))
-	       #:file-not-found-responder
-	       (gen-file-not-found-responder
-		(build-path "templates/not-found.html"))
                #:ssl? #f
                #:stateless? #f
-	       #:log-file "my-website.log")
+               #:log-file "my-website.log")
