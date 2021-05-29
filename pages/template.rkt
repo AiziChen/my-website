@@ -34,13 +34,13 @@
                    [:title (nav-name nav)]
                    [:href (nav-link nav)])
                   (nav-name nav))))))
-       ,@content
+       (:div.content ,@content)
        (:script ([:type "text/javascript"]
-                 [:href "/bootstrap/bootstrap.min.js"]))
+                 [:src "/bootstrap/bootstrap.min.js"]))
        (:script ([:type "text/javascript"]
-                 [:href "/unpoly/unpoly.min.js"]))
+                 [:src "/unpoly/unpoly.min.js"]))
        (:script ([:type "text/javascript"]
-                 [:href "/unpoly/unpoly-bootstrap3.min.js"]))))))
+                 [:src "/unpoly/unpoly-bootstrap3.min.js"]))))))
   (response
    200
    #"OK"

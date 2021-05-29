@@ -6,9 +6,12 @@
 
 (provide song-list)
 
+(define navs
+  (list (nav "HOME" "/" #f)
+        (nav "SONGS" "/song-list" #t)
+        (nav "BLOG" "/blog" #f)))
+
 (define (song-list req)
-  (template "歌单"
-            (list (nav "主页" "/" #f)
-                  (nav "歌单" "/song-list" #t)
-                  (nav "博客" "/blog" #f))
+  (template "SONGS"
+            navs
             '()))

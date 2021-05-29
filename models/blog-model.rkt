@@ -5,7 +5,9 @@
 (provide blog-posts
          post? post-title post-body post-comments post-comments-count
          initialize-blog! get-new-blog-db
-         blog-insert-post! post-insert-comment!)
+         blog-insert-post! post-insert-comment!
+         post-updated-at post-created-at
+         post-comments-created-at post-comments-updated-at)
 
 ;;; BLOG DB PATH
 (define BLOG-DB-HOME (build-path (current-directory) "the-blog-data.db"))
@@ -21,11 +23,11 @@
                    "SELECT id FROM posts ORDER BY id DESC")))
 (define (blog-posts-in-page blog-db page #:each [each 10])
   (map (lambda (id)
-	 (post blog-db id))
+         	 (post blog-db id))
        (query-list blog-db
-		   "SELECT id FROM posts WHERE id BETWEEN ? AND ? ORDER BY id DESC"
-		   (* each (- page 1))
-		   (* each page))))
+                   "SELECT id FROM posts WHERE id BETWEEN ? AND ? ORDER BY id DESC"
+                   (* each (- page 1))
+                   (* each page))))
 (define (post-title blog-db a-post)
   (query-value blog-db
                "SELECT title FROM posts WHERE id = ?"
@@ -34,14 +36,30 @@
   (query-value blog-db
                "SELECT body FROM posts WHERE id = ?"
                (post-id a-post)))
+(define (post-created-at blog-db a-post)
+  (query-value blog-db
+               "SELECT created_at FROM posts WHERE id = ?"
+               (post-id a-post)))
+(define (post-updated-at blog-db a-post)
+  (query-value blog-db
+               "SELECT updated_at FROM posts WHERE id = ?"
+               (post-id a-post)))
 (define (post-comments blog-db a-post)
   (query-list blog-db
               "SELECT content FROM comments WHERE pid = ?"
               (post-id a-post)))
 (define (post-comments-count blog-db a-post)
   (query-value blog-db
-	       "SELECT COUNT(*) FROM comments WHERE pid = ?"
-	       (post-id a-post)))
+               "SELECT COUNT(*) FROM comments WHERE pid = ?"
+               (post-id a-post)))
+(define (post-comments-created-at blog-db a-post)
+  (query-value blog-db
+               "SELECT created_at FROM comments WHERE pid = ?"
+               (post-id a-post)))
+(define (post-comments-updated-at blog-db a-post)
+  (query-value blog-db
+               "SELECT updated_at FROM comments WHERE pid = ?"
+               (post-id a-post)))
 
 (define (initialize-blog!)
   (define db get-new-blog-db)
@@ -50,7 +68,8 @@
                 (string-append
                  "CREATE TABLE posts "
                  "(id INTEGER PRIMARY KEY, title TEXT, body TEXT"
-                 ", DATETIME created_at, DATETIME updated_at)"))
+                 ", created_at DATETIME DEFAULT CURRENT_TIMESTAMP"
+                 ", updated_at DATETIME DEFAULT CURRENT_TIMESTAMP)"))
     (blog-insert-post!
      db "First Post" "This is my first post.")
     (blog-insert-post!
@@ -58,7 +77,9 @@
   (unless (table-exists? db "comments")
     (query-exec db
                 (string-append "CREATE TABLE comments "
-                               "(pid INTEGER, content TEXT)"))
+                               "(pid INTEGER, content TEXT"
+                               ", created_at DATETIME DEFAULT CURRENT_TIMESTAMP"
+                               ", updated_at DATETIME DEFAULT CURRENT_TIMESTAMP)"))
     (post-insert-comment!
      db (first (blog-posts db)) "First Comment"))
   (disconnect db))

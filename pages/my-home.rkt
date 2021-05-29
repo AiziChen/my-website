@@ -13,9 +13,9 @@
 
 (define (render-home-page req)
   (template "Home"
-            (list (nav "主页" "/" #t)
-                  (nav "歌单" "/song-list" #f)
-                  (nav "博客" "/blog" #f))
+            (list (nav "HOME" "/" #t)
+                  (nav "SONGS" "/song-list" #f)
+                  (nav "BLOG" "/blog" #f))
             (haml
              (:pre "生理学、编程、自由、平等")
              (:div "[爱，是什么]")

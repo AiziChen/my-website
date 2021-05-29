@@ -1,15 +1,14 @@
-#lang racket
+#lang racket/base
 
 (require web-server/servlet
-         web-server/templates
-         xml
          koyo/haml
          "template.rkt"
          "../tools/top-tools.rkt"
          "../tools/web-tools.rkt"
          "../models/blog-model.rkt")
 
-(provide blog-entry)
+(provide blog-entry
+         new-blog-post)
 
 ;;; INITIALIZE
 (initialize-blog!)
@@ -17,9 +16,9 @@
 
 (define navs
   (list
-   (nav "主页" "/" #f)
-   (nav "歌单" "/song-list" #f)
-   (nav "博客" "/blog" #t)))
+   (nav "HOME" "/" #f)
+   (nav "SONGS" "/song-list" #f)
+   (nav "BLOG" "/blog" #t)))
 
 
 ;; Entry Servlet For The Server
@@ -38,15 +37,18 @@
        (post-title a-blog a-post))
       (.post-comment-sum
        (let ([len (post-comments-count a-blog a-post)])
-         (~a len (if (> len 1) "comments" "comment")))))))
+         (post-created-at a-blog a-post))))))
   
   (define (response-generator embed/url)
-    (template "博客" navs
+    (template "BLOG" navs
               (haml
-               (list
-                (haml (.posts.list-group
-                       ,@(for/list ([a-post (blog-posts a-blog)])
-                           (render-post a-blog a-post embed/url))))))))
+               (:br)
+               (:a.btn.btn-primary ([:href "/blog/post/new"]
+                                    [:up-modal ".content"])
+                                   "New")
+               (.posts.list-group
+                ,@(for/list ([a-post (blog-posts a-blog)])
+                    (render-post a-blog a-post embed/url))))))
   
   (define (insert-post-handler request)
     (let* ([bindings (request-bindings request)]
@@ -69,7 +71,7 @@
 ;; Render Post Details
 (define (render-post-detail-page a-blog a-post request)
   (define (response-generator embed/url)
-    (template "Blog " navs
+    (template "Blog" navs
               (haml
                (:h2 (post-title a-blog a-post))
                (:hr)
@@ -81,7 +83,8 @@
                (:hr)
                (:h4 "New Comment Here:")
                (:form ([:action (embed/url insert-comment-handler)]
-                       [:method "post"])
+                       [:method "post"]
+                       [:up-modal ".content"])
                       (:textarea ([:name "comment"]
                                   [:type "text"]
                                   [:placeholder "comment"]
@@ -166,3 +169,21 @@
   
   (send/suspend/dispatch response-generator))
 
+
+
+(define (new-blog-post req)
+  (template "New Post"
+            navs
+            (haml
+             (:h2 "New Post")
+             (:form ([:actioin "/blog/post/new"] [:method "post"])
+                    (:label
+                     "Title"(:br)
+                     (:input ([:type "text"] [:placeholder "Title"])))
+                    (:br)
+                    (:label
+                     "Content"(:br)
+                     (:textarea ([:type "text"] [:placeholder "Content"])))
+                    (:br)
+                    (:label
+                     (:input ([:type "submit"] [:value "Submit"])))))))

@@ -2,7 +2,6 @@
 
 (require web-server/servlet-env
          web-server/dispatch
-         web-server/configuration/responders
          "pages/my-home.rkt"
          "pages/my-blog.rkt"
          "pages/my-songlist.rkt")
@@ -15,6 +14,8 @@
    [("") home-entry]
    ;; BLOG
    [("blog") blog-entry]
+   ;; new blog post
+   [("blog" "post" "new") new-blog-post]
    ;; SONG LIST
    [("song-list") song-list]))
 
