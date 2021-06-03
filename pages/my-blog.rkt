@@ -22,8 +22,9 @@
 
 
 ;; Entry Servlet For The Server
-(define (blog-entry request)
-  (render-blog-page get-new-blog-db request))
+(define ((blog-entry blog-db) request)
+  (render-blog-page blog-db request))
+
 
 ;; Render Blog Page
 (define (render-blog-page a-blog request)
@@ -50,21 +51,6 @@
                 ,@(for/list ([a-post (blog-posts a-blog)])
                     (render-post a-blog a-post embed/url))))))
   
-  (define (insert-post-handler request)
-    (let* ([bindings (request-bindings request)]
-           [title (extract-binding/single 'title bindings)]
-           [body (extract-binding/single 'body bindings)])
-      (cond
-        [(and (valid-string? title)
-              (valid-string? body))
-         (blog-insert-post! a-blog title body)
-         (render-blog-page a-blog (redirect/get))]
-        [else
-         (occur-error-page "Empty Blog"
-                           "The blog title & body must be specifed."
-                           (lambda (request)
-                             (render-blog-page a-blog (redirect/get)))
-                           request)])))
   (send/suspend/dispatch response-generator))
 
 
@@ -100,6 +86,7 @@
                 (:a.btn.btn-primary
                  ([:href (embed/url goback-handler)])
                  "Back")))))
+  
   
   (define (insert-comment-handler request)
     (let* ([bindings (request-bindings request)]
@@ -152,6 +139,7 @@
   
   (send/suspend/dispatch response-generator))
 
+
 ;;; Error Ocurred Page
 (define (occur-error-page title message p request)
   (define (response-generator embed/url)
@@ -171,19 +159,37 @@
 
 
 
-(define (new-blog-post req)
-  (template "New Post"
-            navs
-            (haml
-             (:h2 "New Post")
-             (:form ([:actioin "/blog/post/new"] [:method "post"])
-                    (:label
-                     "Title"(:br)
-                     (:input ([:type "text"] [:placeholder "Title"])))
-                    (:br)
-                    (:label
-                     "Content"(:br)
-                     (:textarea ([:type "text"] [:placeholder "Content"])))
-                    (:br)
-                    (:label
-                     (:input ([:type "submit"] [:value "Submit"])))))))
+(define ((new-blog-post a-blog) req)
+  (define (response-generator embed/url)
+    (template "New Post"
+              navs
+              (haml
+               (:h2 "New Post")
+               (:form.row
+                ([:action (embed/url insert-post-handler)] [:method "post"])
+                (:label.form-label
+                 "Title"(:br)
+                 (:input.form-control ([:type "text"] [:placeholder "Title"] [:name "title"])))
+                (:br)
+                (:label.form-label
+                 "Content"(:br)
+                 (:textarea.form-control ([:type "text"] [:placeholder "Content"] [:name "body"])))
+                (:br)
+                (:label
+                 (:input.btn.btn-primary ([:type "submit"] [:value "Submit"])))))))
+  (define (insert-post-handler req)
+    (let* ([bindings (request-bindings req)]
+           [title (extract-binding/single 'title bindings)]
+           [body (extract-binding/single 'body bindings)])
+      (cond
+        [(and (valid-string? title)
+              (valid-string? body))
+         (blog-insert-post! a-blog title body)
+         (render-blog-page a-blog (redirect/get))]
+        [else
+         (occur-error-page "Empty Blog"
+                           "The blog title & body must be specifed."
+                           (lambda (req)
+                             (render-blog-page a-blog (redirect/get)))
+                           req)])))
+  (send/suspend/dispatch response-generator))

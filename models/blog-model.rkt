@@ -4,7 +4,7 @@
 
 (provide blog-posts
          post? post-title post-body post-comments post-comments-count
-         initialize-blog! get-new-blog-db
+         initialize-blog! blog-dbc
          blog-insert-post! post-insert-comment!
          post-updated-at post-created-at
          post-comments-created-at post-comments-updated-at)
@@ -62,7 +62,7 @@
                (post-id a-post)))
 
 (define (initialize-blog!)
-  (define db get-new-blog-db)
+  (define db blog-dbc)
   (unless (table-exists? db "posts")
     (query-exec db
                 (string-append
@@ -85,7 +85,7 @@
   (disconnect db))
 
 ;;; GET NEW BLOG DB CONNECTION
-(define get-new-blog-db
+(define blog-dbc
   (virtual-connection
    (connection-pool
     (lambda ()

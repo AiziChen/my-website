@@ -2,6 +2,7 @@
 
 (require web-server/servlet-env
          web-server/dispatch
+         "models/blog-model.rkt"
          "pages/my-home.rkt"
          "pages/my-blog.rkt"
          "pages/my-songlist.rkt")
@@ -13,9 +14,9 @@
    ;; HOME
    [("") home-entry]
    ;; BLOG
-   [("blog") blog-entry]
-   ;; new blog post
-   [("blog" "post" "new") new-blog-post]
+   [("blog") (blog-entry blog-dbc)]
+   ;; NEW BLOG POST
+   [("blog" "post" "new") (new-blog-post blog-dbc)]
    ;; SONG LIST
    [("song-list") song-list]))
 
