@@ -29,7 +29,9 @@
       (render-post-detail-page blog-db a-post request))
     (haml
      (:a.post.list-group-item.list-group-item-action
-      ([:href (embed/url view-post-handler)])
+      ([:href (embed/url view-post-handler)]
+       [:up-target "body"]
+       [:up-layer "new cover"])
       (.post-link
        (post-title a-post))
       (.post-comment-sum
@@ -37,16 +39,17 @@
          (datetime->normal-string (post-created-at a-post)))))))
   
   (define (response-generator embed/url)
-    (define *body*
+    (define body
       (haml
        (:br)
        (:a.btn.btn-primary ([:href "/blog/post/new"]
-                            [:up-modal ".content"])
+                            [:up-target ".content"]
+                            [:up-layer "new modal"])
                            "New")
        (.posts.list-group
         ,@(for/list ([a-post (blog-posts blog-db)])
             (render-post blog-db a-post embed/url)))))
-    (template "Blog" (page-name) *body*))
+    (template "Blog" (page-name) body))
   
   (send/suspend/dispatch response-generator))
 
@@ -54,7 +57,7 @@
 ;; Render Post Details
 (define (render-post-detail-page blog-db a-post request)
   (define (response-generator embed/url)
-    (define *body*
+    (define body
       (haml
        (:h2 (post-title a-post))
        (:hr)
@@ -67,7 +70,8 @@
        (:h4 "New Comment Here:")
        (:form ([:action (embed/url insert-comment-handler)]
                [:method "post"]
-               [:up-modal ".content"])
+               [:up-target ".content"]
+               [:up-layer "new modal"])
               (:textarea ([:name "comment"]
                           [:type "text"]
                           [:placeholder "comment"]
@@ -77,14 +81,8 @@
               (:br)
               (:input.btn.btn-primary
                ([:type "submit"]
-                [:value "Submit"])))
-       (:hr)
-       (:div
-        (:a.btn.btn-primary
-         ([:href (embed/url goback-handler)])
-         "Back"))))
-    (template "Blog" (page-name) *body*))
-  
+                [:value "Submit"])))))
+    (template "Blog" (page-name) body))
   
   (define (insert-comment-handler request)
     (let* ([bindings (request-bindings request)]
@@ -94,14 +92,11 @@
          (post-insert-comment! blog-db (post-id a-post) comment)
          (render-post-detail-page blog-db a-post (redirect/get))]
         [else
-         (occur-error-page "Empty Comment"
-                           "You should specify the comment content."
-                           (lambda (request)
+         (occur-error-page "Error: Empty Comment"
+                           "! You should specify the comment content !"
+                           (lambda (req)
                              (render-post-detail-page blog-db a-post (redirect/get)))
                            request)])))
-  
-  (define (goback-handler request)
-    (render-blog-page blog-db (redirect/get)))
   
   (send/suspend/dispatch response-generator))
 
@@ -109,7 +104,7 @@
 ;;; Error Ocurred Page
 (define (occur-error-page title message p request)
   (define (response-generator embed/url)
-    (define *body*
+    (define body
       (haml
        (:h1 ([:style "color:red;"]) title)
        (:div
@@ -117,17 +112,17 @@
        (:hr)
        (:div
         (:a.btn.btn-link ([:href (embed/url back-handler)]) "Close"))))
-    (template "Error" (page-name) *body*))
+    (template "Error" (page-name) body))
   
   (define (back-handler req) (p req))
   
   (send/suspend/dispatch response-generator))
 
 
-
+;;; New Blog Post
 (define ((new-blog-post blog-db) req)
   (define (response-generator embed/url)
-    (define *body*
+    (define body
       (haml
        (:h2 "New Post")
        (:form.row
@@ -142,7 +137,7 @@
         (:br)
         (:label
          (:input.btn.btn-primary ([:type "submit"] [:value "Submit"]))))))
-    (template "New Post" (page-name) *body*))
+    (template "New Post" (page-name) body))
   
   (define (insert-post-handler req)
     (let* ([bindings (request-bindings req)]

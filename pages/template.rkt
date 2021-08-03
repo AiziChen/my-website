@@ -50,6 +50,9 @@
        (:link ([:rel "stylesheet"]
                [:type "text/css"]
                [:href "/unpoly/unpoly.min.css"]))
+       (:llink ([:ref "stylesheet"]
+                [:type "text/css"]
+                [:href "/unpoly/unpoly-bootstrap5.min.css"]))
        (:link ([:rel "stylesheet"]
                [:type "text/css"]
                [:href "/top.css"])))
@@ -62,7 +65,7 @@
                  [:src "/unpoly/unpoly.min.js"]))
        #;
        (:script ([:type "text/javascript"]
-                 [:src "/unpoly/unpoly-bootstrap3.min.js"]))))))
+                 [:src "/unpoly/unpoly-bootstrap5.min.js"]))))))
   (response
    200
    #"OK"
