@@ -94,12 +94,7 @@
            [comment (extract-binding/single 'comment bindings)])
       (cond
         [(valid-string? comment)
-         #;
-         (render-confirm-add-comment-page blog-db
-                                          comment
-                                          a-post
-                                          request)
-         (post-insert-comment! blog-db (post-id a-post a-comment))
+         (post-insert-comment! blog-db (post-id a-post) comment)
          (render-post-detail-page blog-db a-post (redirect/get))]
         [else
          (occur-error-page "Empty Comment"
@@ -110,37 +105,6 @@
   
   (define (goback-handler request)
     (render-blog-page blog-db (redirect/get)))
-  
-  (send/suspend/dispatch response-generator))
-
-
-;; Blog Comment Add Confirm
-#;
-(define (render-confirm-add-comment-page blog-db a-comment a-post request)
-  (define (response-generator embed/url)
-    (template "Add Comment" navs
-              (haml
-               (:h1 "Add a Comment")
-               (:p "The Comment"
-                   (:div (:p a-comment)))
-               "will added to"
-               (:h4 (post-title a-post))
-               (:hr)
-               (:p
-                (:a.btn.btn-link
-                 ([:href (embed/url yes-handler)])
-                 "Yes, add the comment."))
-               (:p
-                (:a.btn.btn-link
-                 ([:href (embed/url cancel-handler)])
-                 "No, I changed my mind.")))))
-  
-  (define (yes-handler request)
-    (post-insert-comment! blog-db (post-id a-post) a-comment)
-    (render-post-detail-page blog-db a-post (redirect/get)))
-  
-  (define (cancel-handler request)
-    (render-post-detail-page blog-db a-post (redirect/get)))
   
   (send/suspend/dispatch response-generator))
 
