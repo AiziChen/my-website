@@ -1,69 +1,65 @@
 #lang racket/base
-(require racket/list
-         db)
+(require deta
+         threading
+         gregor
+         db
+         racket/sequence
+         racket/string
+         racket/contract)
 
-(provide blog-posts
-         post? post-title post-body post-comments post-comments-count
-         initialize-blog! blog-dbc
-         blog-insert-post! post-insert-comment!
-         post-updated-at post-created-at
-         post-comments-created-at post-comments-updated-at)
+(provide
+ (schema-out post)
+ (schema-out comment)
+ initialize-blog!
+ blog-dbc
+ blog-posts
+ blog-posts-in-page
+ post-comments
+ blog-insert-post!
+ post-insert-comment!)
 
 ;;; BLOG DB PATH
 (define BLOG-DB-HOME (build-path (current-directory) "the-blog-data.db"))
 
-;;; BLOG MODEL
-;;; STRUCTS
-(struct post (blog id))
+;;; POST MODEL
+(define-schema post
+  ([id id/f #:primary-key #:auto-increment]
+   [title string/f #:contract non-empty-string? #:wrapper string-titlecase]
+   [body string/f #:contract non-empty-string?]
+   [[created-at (now)] string/f]
+   [updated-at string/f]))
+
+;;; COMMENT MODEL
+(define-schema comment
+  ([pid id/f]
+   [content string/f #:contract non-empty-string?]
+   [[created-at (now)] string/f]
+   [updated-at string/f]))
 
 (define (blog-posts blog-db)
-  (map (lambda (id)
-         (post blog-db id))
-       (query-list blog-db
-                   "SELECT id FROM posts ORDER BY id DESC")))
+  (sequence->list
+   (in-entities blog-db
+                (~> (from post #:as p)
+                    (order-by ([p.id #:desc]))))))
+
 (define (blog-posts-in-page blog-db page #:each [each 10])
-  (map (lambda (id)
-         	 (post blog-db id))
-       (query-list blog-db
-                   "SELECT id FROM posts WHERE id BETWEEN ? AND ? ORDER BY id DESC"
-                   (* each (- page 1))
-                   (* each page))))
-(define (post-title blog-db a-post)
-  (query-value blog-db
-               "SELECT title FROM posts WHERE id = ?"
-               (post-id a-post)))
-(define (post-body blog-db a-post)
-  (query-value blog-db
-               "SELECT body FROM posts WHERE id = ?"
-               (post-id a-post)))
-(define (post-created-at blog-db a-post)
-  (query-value blog-db
-               "SELECT created_at FROM posts WHERE id = ?"
-               (post-id a-post)))
-(define (post-updated-at blog-db a-post)
-  (query-value blog-db
-               "SELECT updated_at FROM posts WHERE id = ?"
-               (post-id a-post)))
-(define (post-comments blog-db a-post)
-  (query-list blog-db
-              "SELECT content FROM comments WHERE pid = ?"
-              (post-id a-post)))
-(define (post-comments-count blog-db a-post)
-  (query-value blog-db
-               "SELECT COUNT(*) FROM comments WHERE pid = ?"
-               (post-id a-post)))
-(define (post-comments-created-at blog-db a-post)
-  (query-value blog-db
-               "SELECT created_at FROM comments WHERE pid = ?"
-               (post-id a-post)))
-(define (post-comments-updated-at blog-db a-post)
-  (query-value blog-db
-               "SELECT updated_at FROM comments WHERE pid = ?"
-               (post-id a-post)))
+  (sequence->list
+   (in-entities blog-db
+                (~> (from post #:as p)
+                    (select _ (between p.id
+                                       ,(* each (- page 1))
+                                       ,(* each page)))))))
+
+(define (post-comments blog-db post-id)
+  (sequence->list
+   (in-entities blog-db
+                (~> (from comment #:as c)
+                    (where [(= c.pid ,post-id)])))))
 
 (define (initialize-blog!)
   (define db blog-dbc)
   (unless (table-exists? db "posts")
+    #;(create-table! db 'post)
     (query-exec db
                 (string-append
                  "CREATE TABLE posts "
@@ -75,13 +71,14 @@
     (blog-insert-post!
      db "Second Post" "This is my second post"))
   (unless (table-exists? db "comments")
+    #;(create-table! db 'comment)
     (query-exec db
                 (string-append "CREATE TABLE comments "
                                "(pid INTEGER, content TEXT"
                                ", created_at DATETIME DEFAULT CURRENT_TIMESTAMP"
                                ", updated_at DATETIME DEFAULT CURRENT_TIMESTAMP)"))
     (post-insert-comment!
-     db (first (blog-posts db)) "First Comment"))
+     db (car (blog-posts db)) "First Comment"))
   (disconnect db))
 
 ;;; GET NEW BLOG DB CONNECTION

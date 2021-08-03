@@ -27,18 +27,18 @@
 
 
 ;; Render Blog Page
-(define (render-blog-page a-blog request)
-  (define (render-post a-blog a-post embed/url)
+(define (render-blog-page blog-db request)
+  (define (render-post blog-db a-post embed/url)
     (define (view-post-handler request)
-      (render-post-detail-page a-blog a-post request))
+      (render-post-detail-page blog-db a-post request))
     (haml
      (:a.post.list-group-item.list-group-item-action
       ([:href (embed/url view-post-handler)])
       (.post-link
-       (post-title a-blog a-post))
+       (post-title a-post))
       (.post-comment-sum
-       (let ([len (post-comments-count a-blog a-post)])
-         (post-created-at a-blog a-post))))))
+       (let ([len (post-comments blog-db (post-id a-post))])
+         (post-created-at a-post))))))
   
   (define (response-generator embed/url)
     (template "BLOG" navs
@@ -48,24 +48,24 @@
                                     [:up-modal ".content"])
                                    "New")
                (.posts.list-group
-                ,@(for/list ([a-post (blog-posts a-blog)])
-                    (render-post a-blog a-post embed/url))))))
+                ,@(for/list ([a-post (blog-posts blog-db)])
+                    (render-post blog-db a-post embed/url))))))
   
   (send/suspend/dispatch response-generator))
 
 
 ;; Render Post Details
-(define (render-post-detail-page a-blog a-post request)
+(define (render-post-detail-page blog-db a-post request)
   (define (response-generator embed/url)
     (template "Blog" navs
               (haml
-               (:h2 (post-title a-blog a-post))
+               (:h2 (post-title a-post))
                (:hr)
-               (:p.content (post-body a-blog a-post))
+               (:p.content (post-body a-post))
                (:br)
                (:hr)
                (:h4 "Comments")
-               (render-as-itemized-list (post-comments a-blog a-post))
+               (render-as-itemized-list (post-comments blog-db (post-id a-post)))
                (:hr)
                (:h4 "New Comment Here:")
                (:form ([:action (embed/url insert-comment-handler)]
@@ -93,7 +93,7 @@
            [comment (extract-binding/single 'comment bindings)])
       (cond
         [(valid-string? comment)
-         (render-confirm-add-comment-page a-blog
+         (render-confirm-add-comment-page blog-db
                                           comment
                                           a-post
                                           request)]
@@ -101,17 +101,17 @@
          (occur-error-page "Empty Comment"
                            "You should specify the comment content."
                            (lambda (request)
-                             (render-post-detail-page a-blog a-post (redirect/get)))
+                             (render-post-detail-page blog-db a-post (redirect/get)))
                            request)])))
   
   (define (goback-handler request)
-    (render-blog-page a-blog (redirect/get)))
+    (render-blog-page blog-db (redirect/get)))
   
   (send/suspend/dispatch response-generator))
 
 
 ;; Blog Comment Add Confirm
-(define (render-confirm-add-comment-page a-blog a-comment a-post request)
+(define (render-confirm-add-comment-page blog-db a-comment a-post request)
   (define (response-generator embed/url)
     (template "Add Comment" navs
               (haml
@@ -119,7 +119,7 @@
                (:p "The Comment"
                    (:div (:p a-comment)))
                "will added to"
-               (:h4 (post-title a-blog a-post))
+               (:h4 (post-title blog-db a-post))
                (:hr)
                (:p
                 (:a.btn.btn-link
@@ -131,11 +131,11 @@
                  "No, I changed my mind.")))))
   
   (define (yes-handler request)
-    (post-insert-comment! a-blog a-post a-comment)
-    (render-post-detail-page a-blog a-post (redirect/get)))
+    (post-insert-comment! blog-db (post-id a-post) a-comment)
+    (render-post-detail-page blog-db a-post (redirect/get)))
   
   (define (cancel-handler request)
-    (render-post-detail-page a-blog a-post (redirect/get)))
+    (render-post-detail-page blog-db a-post (redirect/get)))
   
   (send/suspend/dispatch response-generator))
 
@@ -159,7 +159,7 @@
 
 
 
-(define ((new-blog-post a-blog) req)
+(define ((new-blog-post blog-db) req)
   (define (response-generator embed/url)
     (template "New Post"
               navs
@@ -184,12 +184,12 @@
       (cond
         [(and (valid-string? title)
               (valid-string? body))
-         (blog-insert-post! a-blog title body)
-         (render-blog-page a-blog (redirect/get))]
+         (blog-insert-post! blog-db title body)
+         (render-blog-page blog-db (redirect/get))]
         [else
          (occur-error-page "Empty Blog"
                            "The blog title & body must be specifed."
                            (lambda (req)
-                             (render-blog-page a-blog (redirect/get)))
+                             (render-blog-page blog-db (redirect/get)))
                            req)])))
   (send/suspend/dispatch response-generator))
