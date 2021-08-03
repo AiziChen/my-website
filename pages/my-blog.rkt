@@ -11,15 +11,10 @@
 (provide blog-entry
          new-blog-post)
 
+(define (page-name) "BLOG")
+
 ;;; INITIALIZE
 (initialize-blog!)
-
-
-(define navs
-  (list
-   (nav "HOME" "/" #f)
-   (nav "SONGS" "/song-list" #f)
-   (nav "BLOG" "/blog" #t)))
 
 
 ;; Entry Servlet For The Server
@@ -42,15 +37,16 @@
          (datetime->normal-string (post-created-at a-post)))))))
   
   (define (response-generator embed/url)
-    (template "Blog" navs
-              (haml
-               (:br)
-               (:a.btn.btn-primary ([:href "/blog/post/new"]
-                                    [:up-modal ".content"])
-                                   "New")
-               (.posts.list-group
-                ,@(for/list ([a-post (blog-posts blog-db)])
-                    (render-post blog-db a-post embed/url))))))
+    (define *body*
+      (haml
+       (:br)
+       (:a.btn.btn-primary ([:href "/blog/post/new"]
+                            [:up-modal ".content"])
+                           "New")
+       (.posts.list-group
+        ,@(for/list ([a-post (blog-posts blog-db)])
+            (render-post blog-db a-post embed/url)))))
+    (template "Blog" (page-name) *body*))
   
   (send/suspend/dispatch response-generator))
 
@@ -58,35 +54,36 @@
 ;; Render Post Details
 (define (render-post-detail-page blog-db a-post request)
   (define (response-generator embed/url)
-    (template "Blog" navs
-              (haml
-               (:h2 (post-title a-post))
-               (:hr)
-               (:p.content (post-body a-post))
-               (:br)
-               (:hr)
-               (:h4 "Comments")
-               (render-as-itemized-list (map comment-content (post-comments blog-db (post-id a-post))))
-               (:hr)
-               (:h4 "New Comment Here:")
-               (:form ([:action (embed/url insert-comment-handler)]
-                       [:method "post"]
-                       [:up-modal ".content"])
-                      (:textarea ([:name "comment"]
-                                  [:type "text"]
-                                  [:placeholder "comment"]
-                                  [:class "form-control"]
-                                  [:cols "33"]
-                                  [:rows "3"]))
-                      (:br)
-                      (:input.btn.btn-primary
-                       ([:type "submit"]
-                        [:value "Submit"])))
-               (:hr)
-               (:div
-                (:a.btn.btn-primary
-                 ([:href (embed/url goback-handler)])
-                 "Back")))))
+    (define *body*
+      (haml
+       (:h2 (post-title a-post))
+       (:hr)
+       (:p.content (post-body a-post))
+       (:br)
+       (:hr)
+       (:h4 "Comments")
+       (render-as-itemized-list (map comment-content (post-comments blog-db (post-id a-post))))
+       (:hr)
+       (:h4 "New Comment Here:")
+       (:form ([:action (embed/url insert-comment-handler)]
+               [:method "post"]
+               [:up-modal ".content"])
+              (:textarea ([:name "comment"]
+                          [:type "text"]
+                          [:placeholder "comment"]
+                          [:class "form-control"]
+                          [:cols "33"]
+                          [:rows "3"]))
+              (:br)
+              (:input.btn.btn-primary
+               ([:type "submit"]
+                [:value "Submit"])))
+       (:hr)
+       (:div
+        (:a.btn.btn-primary
+         ([:href (embed/url goback-handler)])
+         "Back"))))
+    (template "Blog" (page-name) *body*))
   
   
   (define (insert-comment-handler request)
@@ -112,17 +109,17 @@
 ;;; Error Ocurred Page
 (define (occur-error-page title message p request)
   (define (response-generator embed/url)
-    (template "Error" navs
-              (haml
-               (:h1 ([:style "color:red;"]) title)
-               (:div
-                (:p message))
-               (:hr)
-               (:div
-                (:a.btn.btn-link ([:href (embed/url back-handler)])
-                                 "Close")))))
+    (define *body*
+      (haml
+       (:h1 ([:style "color:red;"]) title)
+       (:div
+        (:p message))
+       (:hr)
+       (:div
+        (:a.btn.btn-link ([:href (embed/url back-handler)]) "Close"))))
+    (template "Error" (page-name) *body*))
   
-  (define (back-handler request) (p request))
+  (define (back-handler req) (p req))
   
   (send/suspend/dispatch response-generator))
 
@@ -130,22 +127,23 @@
 
 (define ((new-blog-post blog-db) req)
   (define (response-generator embed/url)
-    (template "New Post"
-              navs
-              (haml
-               (:h2 "New Post")
-               (:form.row
-                ([:action (embed/url insert-post-handler)] [:method "post"])
-                (:label.form-label
-                 "Title"(:br)
-                 (:input.form-control ([:type "text"] [:placeholder "Title"] [:name "title"])))
-                (:br)
-                (:label.form-label
-                 "Content"(:br)
-                 (:textarea.form-control ([:type "text"] [:placeholder "Content"] [:name "body"])))
-                (:br)
-                (:label
-                 (:input.btn.btn-primary ([:type "submit"] [:value "Submit"])))))))
+    (define *body*
+      (haml
+       (:h2 "New Post")
+       (:form.row
+        ([:action (embed/url insert-post-handler)] [:method "post"])
+        (:label.form-label
+         "Title"(:br)
+         (:input.form-control ([:type "text"] [:placeholder "Title"] [:name "title"])))
+        (:br)
+        (:label.form-label
+         "Content"(:br)
+         (:textarea.form-control ([:type "text"] [:placeholder "Content"] [:name "body"])))
+        (:br)
+        (:label
+         (:input.btn.btn-primary ([:type "submit"] [:value "Submit"]))))))
+    (template "New Post" (page-name) *body*))
+  
   (define (insert-post-handler req)
     (let* ([bindings (request-bindings req)]
            [title (extract-binding/single 'title bindings)]
@@ -161,4 +159,5 @@
                            (lambda (req)
                              (render-blog-page blog-db (redirect/get)))
                            req)])))
+  
   (send/suspend/dispatch response-generator))

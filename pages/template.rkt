@@ -5,11 +5,40 @@
          xml
          web-server/servlet
          racket/format
+         racket/contract
          "../tools/web-tools.rkt")
 
 (provide template)
 
-(define (template title navs content)
+
+(struct nav (name link))
+(define *navs*
+  (list
+   (nav "HOME" "/")
+   (nav "SONGS" "/song-list")
+   (nav "BLOG" "/blog")))
+
+
+(define/contract (nav-bar active-item)
+  (-> string? xexpr?)
+  (define (active? item)
+    (if (eqv? (nav-name item) active-item)
+        "active" ""))
+  
+  (define list-items
+    (for/list ([nav *navs*])
+      (haml
+       (:li.nav-item
+        (:a ([:class (~a "nav-link " (active? nav))]
+             [:data-bs-toggle "tooltip"]
+             [:title (nav-name nav)]
+             [:href (nav-link nav)])
+            (nav-name nav))))))
+  
+  (haml (:ul.nav.nav-pills.top-nav ,@list-items)))
+
+
+(define (template title active-item content)
   (define page
     (haml
      (:html
@@ -25,15 +54,7 @@
                [:type "text/css"]
                [:href "/top.css"])))
       (:body
-       (:ul.nav.nav-pills.top-nav
-        ,@(for/list ([nav navs])
-            (haml
-             (:li.nav-item
-              (:a ([:class (~a "nav-link " (if (nav-active? nav) "active" ""))]
-                   [:data-bs-toggle "tooltip"]
-                   [:title (nav-name nav)]
-                   [:href (nav-link nav)])
-                  (nav-name nav))))))
+       (nav-bar active-item)
        (:div.content ,@content)
        (:script ([:type "text/javascript"]
                  [:src "/bootstrap/bootstrap.min.js"]))

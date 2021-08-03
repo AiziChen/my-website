@@ -8,7 +8,6 @@
 
 (provide
  response/template valid-string?
- nav nav-name nav-link nav-active? set-nav-active?!
  datetime->normal-string)
 
 
@@ -23,9 +22,6 @@
 
 (define (valid-string? s)
   (non-empty-string? s))
-
-
-(struct nav (name link [active? #:mutable]))
 
 
 (define (datetime->normal-string dt)
