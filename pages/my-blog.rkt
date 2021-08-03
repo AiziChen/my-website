@@ -42,7 +42,7 @@
          (datetime->normal-string (post-created-at a-post)))))))
   
   (define (response-generator embed/url)
-    (template "BLOG" navs
+    (template "Blog" navs
               (haml
                (:br)
                (:a.btn.btn-primary ([:href "/blog/post/new"]
@@ -94,10 +94,13 @@
            [comment (extract-binding/single 'comment bindings)])
       (cond
         [(valid-string? comment)
+         #;
          (render-confirm-add-comment-page blog-db
                                           comment
                                           a-post
-                                          request)]
+                                          request)
+         (post-insert-comment! blog-db (post-id a-post a-comment))
+         (render-post-detail-page blog-db a-post (redirect/get))]
         [else
          (occur-error-page "Empty Comment"
                            "You should specify the comment content."
@@ -112,6 +115,7 @@
 
 
 ;; Blog Comment Add Confirm
+#;
 (define (render-confirm-add-comment-page blog-db a-comment a-post request)
   (define (response-generator embed/url)
     (template "Add Comment" navs

@@ -29,7 +29,7 @@
         ,@(for/list ([nav navs])
             (haml
              (:li.nav-item
-              (:a ([:class (~a "nav-link " (when (nav-active? nav) "active"))]
+              (:a ([:class (~a "nav-link " (if (nav-active? nav) "active" ""))]
                    [:data-bs-toggle "tooltip"]
                    [:title (nav-name nav)]
                    [:href (nav-link nav)])
@@ -39,6 +39,7 @@
                  [:src "/bootstrap/bootstrap.min.js"]))
        (:script ([:type "text/javascript"]
                  [:src "/unpoly/unpoly.min.js"]))
+       #;
        (:script ([:type "text/javascript"]
                  [:src "/unpoly/unpoly-bootstrap3.min.js"]))))))
   (response
