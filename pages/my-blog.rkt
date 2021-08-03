@@ -1,7 +1,8 @@
 #lang racket/base
 
-(require web-server/servlet
-         koyo/haml
+(require koyo/haml
+         gregor
+         web-server/servlet
          "template.rkt"
          "../tools/top-tools.rkt"
          "../tools/web-tools.rkt"
@@ -38,7 +39,7 @@
        (post-title a-post))
       (.post-comment-sum
        (let ([len (post-comments blog-db (post-id a-post))])
-         (post-created-at a-post))))))
+         (datetime->normal-string (post-created-at a-post)))))))
   
   (define (response-generator embed/url)
     (template "BLOG" navs
@@ -65,7 +66,7 @@
                (:br)
                (:hr)
                (:h4 "Comments")
-               (render-as-itemized-list (post-comments blog-db (post-id a-post)))
+               (render-as-itemized-list (map comment-content (post-comments blog-db (post-id a-post))))
                (:hr)
                (:h4 "New Comment Here:")
                (:form ([:action (embed/url insert-comment-handler)]
@@ -119,7 +120,7 @@
                (:p "The Comment"
                    (:div (:p a-comment)))
                "will added to"
-               (:h4 (post-title blog-db a-post))
+               (:h4 (post-title a-post))
                (:hr)
                (:p
                 (:a.btn.btn-link
