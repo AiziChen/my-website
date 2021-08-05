@@ -27,15 +27,14 @@
 (define *music-search-api* "http://43.128.26.51:5000/api/music/search")
 (define/contract (music-search text type page)
   (-> non-empty-string? non-empty-string? positive-integer?
-      (or/c #f (listof hash?)))
+      (listof hash?))
   (define rs
-    (he:response-json
-     (he:post *music-search-api*
-              #:json (hasheq 'text (uri-encode text)
-                             'type type
-                             'page page))))
+    (with-handlers ([exn? (lambda (e) (hasheq 'code 501))])
+      (he:response-json
+       (he:post *music-search-api*
+                #:json (hasheq 'text (uri-encode text)
+                               'type type
+                               'page page)))))
   (if (eqv? (hash-ref rs 'code) 200)
-      (hash-ref
-       (hash-ref rs 'data)
-       'list)
-      #f))
+      (hash-ref (hash-ref rs 'data) 'list)
+      '()))
