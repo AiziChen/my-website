@@ -32,7 +32,8 @@
           ([:name "music-platform"])
           (:option ([:value "migu"]
                     [:selected ""]) "咪咕")
-          (:option ([:value "YQB"]) "酷狗")
+          (:option ([:value "kugou"]) "酷狗")
+          (:option ([:value "YQB"]) "酷我")
           (:option ([:value "YQA"]) "网易")
           (:option ([:value "douban"]) "豆瓣")
           (:option ([:value "5singfc"]) "5SING FC")
@@ -75,11 +76,34 @@
         (hash-ref item 'name))
        (:small
         (hash-ref item 'artist))))))
-  (define body
-    (haml
-     (:h1 ([:sytle "color:red"])
-          (string-append "「" text "」" " Search Result:"))
-     (.list-group
-      ,@(for/list ([item (music-search text platform page)])
-          (render-item-list item)))))
-  (template "Search Result" "SONGS" body #:scripts '("/my-songlist.js")))
+  (define (next-page-handler req)
+      (search-result-page text platform (+ page 1) req))
+  (define (response-generator embed/url)
+    (define body
+      (haml
+       (:h2 ([:sytle "color:green;"])
+            (string-append "「" text "」" " Search Result:"))
+       (.list-group
+        ,@(let* ([jsexp (music-search text platform page)]
+                 [items (hash-ref jsexp 'list)]
+                 [size (length items)]
+                 [more (string->number (hash-ref jsexp 'more))])
+            (cond
+              [(< 0 size)
+               (if (> more 0)
+                   (append
+                    (for/list ([item items])
+                      (render-item-list item))
+                    (list
+                     (haml
+                      (:a.btn.btn-primary
+                       ([:href (embed/url next-page-handler)])
+                       "Next"))))
+                   (for/list ([item items])
+                     (render-item-list item)))]
+              [else
+               (haml
+                (.empty)
+                (:p ([:style "color:red;"]) "0 music found."))])))))
+    (template "Search Result" "SONGS" body #:scripts '("/my-songlist.js")))
+  (send/suspend/dispatch response-generator))
