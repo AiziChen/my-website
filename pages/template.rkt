@@ -40,7 +40,9 @@
   (haml (:ul.nav.nav-pills.top-nav ,@list-items)))
 
 
-(define (template title active-item content #:scripts [scripts '()])
+(define (template title active-item content
+                  #:scripts [scripts '()]
+                  #:csses [csses '()])
   (define page
     (haml
      (:html
@@ -62,7 +64,12 @@
                 [:href "/unpoly/unpoly-bootstrap5.min.css"]))
        (:link ([:rel "stylesheet"]
                [:type "text/css"]
-               [:href "/top.css"])))
+               [:href "/top.css"]))
+       ,@(for/list ([c csses])
+           (haml
+            (:link ([:rel "stylesheet"]
+                    [:type "text/css"]
+                    [:href c])))))
       (:body
        (nav-bar active-item)
        (:div.content ,@content)

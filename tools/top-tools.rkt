@@ -10,7 +10,8 @@
 
 (provide
  render-as-itemized-list
- music-search)
+ music-search
+ get-music-lyric)
 
 
 (define (render-as-itemized-list l)
@@ -29,12 +30,22 @@
   (-> non-empty-string? non-empty-string? positive-integer?
       hash?)
   (define rs
-    (with-handlers ([exn? (lambda (e) (hasheq 'code 501))])
-      (he:response-json
-       (he:post *music-search-api*
-                #:json (hasheq 'text (uri-encode text)
-                               'type type
-                               'page page)))))
+    (with-handlers ([exn? (lambda (e) (hasheq 'code 500))])
+      (define resp
+        (he:post *music-search-api*
+                 #:json (hasheq 'text (uri-encode text)
+                                'type type
+                                'page page)))
+      (if (= (he:response-status-code resp) 200)
+          (he:response-json resp)
+          (hasheq 'code 503))))
   (if (eqv? (hash-ref rs 'code) 200)
       (hash-ref rs 'data)
       (hasheq)))
+
+(define/contract (get-music-lyric url)
+  (-> non-empty-string? (or/c string? #f))
+  (let ([resp (he:get url)])
+    (if (= (he:response-status-code resp) 200)
+        (he:response-body resp)
+        #f)))

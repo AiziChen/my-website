@@ -32,7 +32,7 @@
           ([:name "music-platform"])
           (:option ([:value "migu"]
                     [:selected ""]) "咪咕")
-          (:option ([:value "kugou"]) "酷狗")
+          (:option ([:value "YQC"]) "酷狗")
           (:option ([:value "YQB"]) "酷我")
           (:option ([:value "YQA"]) "网易")
           (:option ([:value "douban"]) "豆瓣")
@@ -71,7 +71,13 @@
     (haml
      (.list-group-item.list-group-item-action
       (.d-flex.w-100.justify-content-between.play-div
-       ([:src (hash-ref item 'url)])
+       ([:url (hash-ref item 'url)]
+        ;[:name (hash-ref item 'name)]
+        ;[:artist (hash-ref item 'artist)]
+        ;[:cover (hash-ref item 'cover)]
+        [:lrc (hash-ref item 'lrc)]
+        ;[:time (hash-ref item 'time)]
+        )
        (:h6.mb-1
         (hash-ref item 'name))
        (:small
@@ -83,6 +89,7 @@
       (haml
        (:h2 ([:sytle "color:green;"])
             (string-append "「" text "」" " Search Result:"))
+       (:div ([:id "lrc-panel"]) "")
        (.list-group
         ,@(let* ([jsexp (music-search text platform page)]
                  [items (hash-ref jsexp 'list)]
@@ -105,5 +112,7 @@
                (haml
                 (.empty)
                 (:p ([:style "color:red;"]) "0 music found."))])))))
-    (template "Search Result" "SONGS" body #:scripts '("/my-songlist.js")))
+    (template "Search Result" "SONGS" body
+              #:scripts '("/my-songlist.js")
+              #:csses '("/my-songlist.css")))
   (send/suspend/dispatch response-generator))
