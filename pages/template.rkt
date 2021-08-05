@@ -8,7 +8,9 @@
          racket/contract
          "../tools/web-tools.rkt")
 
-(provide template)
+(provide
+ template
+ occur-error-page)
 
 
 (struct nav (name link))
@@ -38,7 +40,7 @@
   (haml (:ul.nav.nav-pills.top-nav ,@list-items)))
 
 
-(define (template title active-item content)
+(define (template title active-item content #:scripts [scripts '()])
   (define page
     (haml
      (:html
@@ -63,9 +65,15 @@
                  [:src "/bootstrap/bootstrap.min.js"]))
        (:script ([:type "text/javascript"]
                  [:src "/unpoly/unpoly.min.js"]))
+       (:script ([:type "text/javascript"]
+                 [:src "/player/howler.min.js"]))
        #;
        (:script ([:type "text/javascript"]
-                 [:src "/unpoly/unpoly-bootstrap5.min.js"]))))))
+                 [:src "/unpoly/unpoly-bootstrap5.min.js"]))
+       ,@(for/list ([s scripts])
+           (haml
+            (:script ([:type "text/javascript"]
+                      [:src s]))))))))
   (response
    200
    #"OK"
@@ -76,3 +84,21 @@
      (parameterize ([current-output-port out])
        (displayln "<!doctype html>")
        (write-xml/content (xexpr->xml page))))))
+
+
+;;; Error Ocurred Page
+(define (occur-error-page title message p request)
+  (define (response-generator embed/url)
+    (define body
+      (haml
+       (:h1 ([:style "color:red;"]) title)
+       (:div
+        (:p message))
+       (:hr)
+       (:div
+        (:a.btn.btn-link ([:href (embed/url back-handler)]) "Close"))))
+    (template "Error" "ERROR" body))
+  
+  (define (back-handler req) (p req))
+  
+  (send/suspend/dispatch response-generator))

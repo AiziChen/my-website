@@ -29,9 +29,7 @@
       (render-post-detail-page blog-db a-post request))
     (haml
      (:a.post.list-group-item.list-group-item-action
-      ([:href (embed/url view-post-handler)]
-       [:up-target "body"]
-       [:up-layer "new cover"])
+      ([:href (embed/url view-post-handler)])
       (.post-link
        (post-title a-post))
       (.post-comment-sum
@@ -69,9 +67,7 @@
        (:hr)
        (:h4 "New Comment Here:")
        (:form ([:action (embed/url insert-comment-handler)]
-               [:method "post"]
-               [:up-target ".content"]
-               [:up-layer "new modal"])
+               [:method "post"])
               (:textarea ([:name "comment"]
                           [:type "text"]
                           [:placeholder "comment"]
@@ -97,24 +93,6 @@
                            (lambda (req)
                              (render-post-detail-page blog-db a-post (redirect/get)))
                            request)])))
-  
-  (send/suspend/dispatch response-generator))
-
-
-;;; Error Ocurred Page
-(define (occur-error-page title message p request)
-  (define (response-generator embed/url)
-    (define body
-      (haml
-       (:h1 ([:style "color:red;"]) title)
-       (:div
-        (:p message))
-       (:hr)
-       (:div
-        (:a.btn.btn-link ([:href (embed/url back-handler)]) "Close"))))
-    (template "Error" (page-name) body))
-  
-  (define (back-handler req) (p req))
   
   (send/suspend/dispatch response-generator))
 
