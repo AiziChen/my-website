@@ -33,7 +33,11 @@
           (:option ([:value "migu"]
                     [:selected ""]) "咪咕")
           (:option ([:value "YQB"]) "酷狗")
-          (:option ([:value "YQA"]) "网易")))
+          (:option ([:value "YQA"]) "网易")
+          (:option ([:value "douban"]) "豆瓣")
+          (:option ([:value "5singfc"]) "5SING FC")
+          (:option ([:value "wusingyc"]) "5SING YC")
+          (:option ([:value "djyule"]) "DJ娱乐")))
         (.col-auto
          (:input.form-control
           ([:type "text"]
