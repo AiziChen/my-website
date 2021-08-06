@@ -41,7 +41,7 @@ function playMusic(src) {
         },
         onend: () => {
           stopLyric();
-          if (currentIndex++ < playList.length) {
+          if (++currentIndex < playList.length) {
             playMusic(playList[currentIndex].url);
           } else {
             console.log('music list all played done.');
