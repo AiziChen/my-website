@@ -2,25 +2,26 @@ let howl = null;
 let playList = [];
 let currentIndex = 0;
 let lrcPanel = null;
-let currentLrcText = "";
+let lrcPlayer = null;
 
 const step = () => {
-  if (currentLrcText !== null) {
-    // TODO: implement playing lyric
-    lrcPanel.innerText = new Date();//currentLrcText.substr(1, 10);
-  }
-  if (howl != null && howl.playing()) {
+  if (howl != null && howl != undefined && howl.playing() && lrcPlayer != null) {
+    let pos = howl.seek();
+    let ctObj = lrcPlayer.getLyrics()[lrcPlayer.select(pos)];
+    if (ctObj != undefined) {
+       lrcPanel.innerText = ctObj.text;
+    }
     requestAnimationFrame(step);
   }
 };
 
 function playMusic(src) {
-  if (howl != null) {
+  if (howl != null && howl != undefined) {
     howl.unload();
   }
   howl = new Howl({
      src: src,
-        format: ['mp3', 'aac', 'mpeg', 'opus', 'ogg', 'oga', 'wav', 'aac', 'caf', 'm4a', 'mp4', 'weba', 'webm',
+        format: ['mp3', 'aac', 'mpeg', 'opus', 'ogg', 'oga', 'wav', 'caf', 'm4a', 'mp4', 'weba', 'webm',
           'bolby', 'flac'
         ],
         html5: true,
@@ -43,8 +44,11 @@ function playMusic(src) {
             return res.text();
           })
           .then(res => {
-            currentLrcText = res;
+            lrcPlayer = new Lyrics(res);
+            // make lyric animatly
             requestAnimationFrame(step);
+            // change the window title
+            document.title = `${playList[currentIndex].name} - ${playList[currentIndex].artist}`;
           })
           .catch(e => {
             console.error('request lyric error');
@@ -61,19 +65,21 @@ window.onload = () => {
   const eles = document.getElementsByClassName('play-div');
   for (let i = 0; i < eles.length; ++i) {
       /*playList.push({
-        url: t.getAttribute('url'),
-        name: t.getAttribute('name'),
-        arties: t.getAttribute('artist'),
         cover: t.getAttribute('cover'),
         lrc: t.getAttribute('lrc'),
         time: t.getAttribute('time')
       });*/
     playList.push({
       url: eles[i].getAttribute('url'),
-      lrc: eles[i].getAttribute('lrc')
+      lrc: eles[i].getAttribute('lrc'),
+      name: eles[i].getAttribute('name'),
+      artist: eles[i].getAttribute('artist')
     });
     eles[i].addEventListener('click', (e) => {
-      const t = e.target;
+      let t = e.target;
+      if (t.tagName !== "DIV") {
+        t = t.parentElement;
+      }
       playMusic(t.getAttribute('url'));
       currentIndex = i;
     });

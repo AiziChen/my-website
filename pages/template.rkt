@@ -79,6 +79,8 @@
                  [:src "/unpoly/unpoly.min.js"]))
        (:script ([:type "text/javascript"]
                  [:src "/player/howler.min.js"]))
+       (:script ([:type "text/javascript"]
+                 [:src "/player/lyrics.min.js"]))
        #;
        (:script ([:type "text/javascript"]
                  [:src "/unpoly/unpoly-bootstrap5.min.js"]))

@@ -19,7 +19,7 @@
   (define (response-generator embed/url)
     (define body
       (haml
-       (:h1 "My Song List")
+       (:h1 "Free Music Search")
        (:form.row.g-2
         ([:action (embed/url search-handler)]
          [:type "POST"]
@@ -30,9 +30,9 @@
         (.col-auto
          (:select.form-select
           ([:name "music-platform"])
+          (:option ([:value "YQC"]) "酷狗")
           (:option ([:value "migu"]
                     [:selected ""]) "咪咕")
-          (:option ([:value "YQC"]) "酷狗")
           (:option ([:value "YQB"]) "酷我")
           (:option ([:value "YQA"]) "网易")
           (:option ([:value "douban"]) "豆瓣")
@@ -72,8 +72,8 @@
      (.list-group-item.list-group-item-action
       (.d-flex.w-100.justify-content-between.play-div
        ([:url (hash-ref item 'url)]
-        ;[:name (hash-ref item 'name)]
-        ;[:artist (hash-ref item 'artist)]
+        [:name (hash-ref item 'name)]
+        [:artist (hash-ref item 'artist)]
         ;[:cover (hash-ref item 'cover)]
         [:lrc (hash-ref item 'lrc)]
         ;[:time (hash-ref item 'time)]
@@ -83,7 +83,7 @@
        (:small
         (hash-ref item 'artist))))))
   (define (next-page-handler req)
-      (search-result-page text platform (+ page 1) req))
+    (search-result-page text platform (+ page 1) req))
   (define (response-generator embed/url)
     (define body
       (haml
@@ -112,7 +112,9 @@
                (haml
                 (.empty)
                 (:p ([:style "color:red;"]) "0 music found."))])))))
-    (template "Search Result" "SONGS" body
+    (template (string-append "Search 「" text "」")
+              "SONGS"
+              body
               #:scripts '("/my-songlist.js")
               #:csses '("/my-songlist.css")))
   (send/suspend/dispatch response-generator))
