@@ -2,18 +2,27 @@ let howl = null;
 let playList = [];
 let currentIndex = 0;
 let lrcPanel = null;
-let lrcPlayer = null;
+let timeoutArrs = [];
 
-const step = () => {
-  if (howl != null && howl != undefined && howl.playing() && lrcPlayer != null) {
-    let pos = howl.seek();
-    let ctObj = lrcPlayer.getLyrics()[lrcPlayer.select(pos)];
-    if (ctObj != undefined) {
-       lrcPanel.innerText = ctObj.text;
+const playLyric = (player) => {
+  if (howl != null && howl != undefined) {
+    for (const obj of player.getLyrics()) {
+      let toutFd = setTimeout(() => {
+        if (howl.playing()) {
+          lrcPanel.innerText = obj.text;
+        }
+      }, obj.timestamp * 1000 - how.seek() * 1000);
+      timeoutArrs.push(toutFd);
     }
-    requestAnimationFrame(step);
   }
 };
+
+const stopLyric = () => {
+  for (const v of timeoutArrs) {
+    clearTimeout(v);
+  }
+  timeoutArrs = [];
+}
 
 function playMusic(src) {
   if (howl != null && howl != undefined) {
@@ -30,6 +39,7 @@ function playMusic(src) {
           howl.play();
         },
         onend: () => {
+          stopLyric();
           if (currentIndex++ < playList.length) {
             playMusic(playList[currentIndex].url);
           } else {
@@ -37,6 +47,7 @@ function playMusic(src) {
           }
         },
         onplay: () => {
+          stopLyric();
           fetch("http://43.128.26.51:5000/api/music/get-lyric.lrc?url=" + playList[currentIndex].lrc, {
             method: 'get'
           })
@@ -46,7 +57,7 @@ function playMusic(src) {
           .then(res => {
             lrcPlayer = new Lyrics(res);
             // make lyric animatly
-            requestAnimationFrame(step);
+            playLyric(lrcPlayer);
             // change the window title
             document.title = `${playList[currentIndex].name} - ${playList[currentIndex].artist}`;
           })
@@ -55,7 +66,6 @@ function playMusic(src) {
           });
         },
         onseek: () => {
-          //requestAnimationFrame(step);
         }
   });
 }
