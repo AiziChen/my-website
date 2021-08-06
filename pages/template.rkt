@@ -37,7 +37,21 @@
              [:href (nav-link nav)])
             (nav-name nav))))))
   
-  (haml (:ul.nav.nav-pills.top-nav ,@list-items)))
+  (haml
+   (:nav.navbar.navbar-expand-lg.navbar-light.bg-light
+    (.container-fluid
+     (:h5.navbar-brand "QUANYE CHEN")
+     (:button.navbar-toggler
+      ([:data-bs-toggle "collapse"]
+       [:data-bs-target "#navbarNavDropdown"]
+       [:aria-controls "navbarNavDropdown"]
+       [:aria-expanded "false"]
+       [:aria-label "Toggle Navigation"])
+      (:span.navbar-toggler-icon))
+     (.collapse.navbar-collapse.justify-content-end
+      ([:id "navbarNavDropdown"])
+      (:ul.navbar-nav
+       ,@list-items))))))
 
 
 (define (template title active-item content
@@ -79,8 +93,6 @@
                  [:src "/unpoly/unpoly.min.js"]))
        (:script ([:type "text/javascript"]
                  [:src "/player/howler.min.js"]))
-       (:script ([:type "text/javascript"]
-                 [:src "/player/lyrics.min.js"]))
        #;
        (:script ([:type "text/javascript"]
                  [:src "/unpoly/unpoly-bootstrap5.min.js"]))

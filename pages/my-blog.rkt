@@ -43,7 +43,7 @@
        (:a.btn.btn-primary ([:href "/blog/post/new"]
                             [:up-target ".content"]
                             [:up-layer "new modal"])
-                           "New")
+                           "New Post")
        (.posts.list-group
         ,@(for/list ([a-post (blog-posts blog-db)])
             (render-post blog-db a-post embed/url)))))

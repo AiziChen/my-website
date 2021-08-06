@@ -5,25 +5,31 @@
     }
 }
 
+html {
+    height: 100%;
+    padding-bottom: 4px;
+}
+
 body {
-    margin:2px;
+    margin: 2px;
+    height: 100%;
     border: 1px solid black;
     border-radius: 4px;
     padding-left: 6%;
     padding-right: 6%;
     padding-top: 2%;
     padding-bottom: 2%;
-    font-family: 'STHeiti Light', 'STHeiti', 'STSong', 'Microsoft YaHei', '文泉驿微米黑', 'Arial', 'Serif';
+    font-family: 'STHeiti Light', 'STHeiti', 'STSong', 'Microsoft YaHei', '微软雅黑', '文泉驿微米黑', 'Arial', 'Serif';
 }
 
 p {
-    font-family: 'STHeiti Light', 'STHeiti', 'STSong', 'Microsoft YaHei', '文泉驿微米黑', 'sans-serif';
+    font-family: 'STHeiti Light', 'STHeiti', 'STSong', 'Microsoft YaHei', '微软雅黑', '文泉驿微米黑', 'sans-serif';
 }
 p.content {
     white-space: pre-line;
 }
 h1 { color: #2f2f2f }
-span.hot { color: red }
+/* span.hot { color: red } */
 
 div.post-link {
     color: #2f2fff;
@@ -39,7 +45,7 @@ div.post-comment-sum {
 }
 
 /* top-nav-bar */
-ul.nav.nav-pills {
+/*ul.nav.nav-pills {
     box-shadow: -2px -1px 2px 1px rgba(46, 125, 255, 0.18);
     border: 2px solid #2af;
     border-radius: 2px;
@@ -52,3 +58,4 @@ ul.nav.nav-pills {
     color: #fff;
     background-color: #666;
 }
+*/

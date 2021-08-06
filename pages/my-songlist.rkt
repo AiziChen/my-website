@@ -89,7 +89,7 @@
       (haml
        (:h2 ([:sytle "color:green;"])
             (string-append "「" text "」" " Search Result:"))
-       (:div ([:id "lrc-panel"]) "")
+       (:div ([:id "lrc-panel"]) "FREE MUSIC PLAYER")
        (.list-group
         ,@(let* ([jsexp (music-search text platform page)]
                  [items (hash-ref jsexp 'list)]
@@ -115,6 +115,6 @@
     (template (string-append "Search 「" text "」")
               "SONGS"
               body
-              #:scripts '("/my-songlist.js")
+              #:scripts '("/player/lyrics.min.js" "/my-songlist.js")
               #:csses '("/my-songlist.css")))
   (send/suspend/dispatch response-generator))

@@ -22,6 +22,7 @@ const stopLyric = () => {
     clearTimeout(v);
   }
   timeoutArrs = [];
+  lrcPanel.innerText = "FREE MUSIC PLAYER";
 }
 
 function playMusic(src) {
