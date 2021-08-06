@@ -1,6 +1,7 @@
 #lang racket/base
 
 (require koyo/haml
+         koyo/http
          gregor
          web-server/servlet
          "template.rkt"
@@ -63,7 +64,10 @@
        (:br)
        (:hr)
        (:h4 "Comments")
-       (render-as-itemized-list (map comment-content (post-comments blog-db (post-id a-post))))
+       (let ([lst (map comment-content (post-comments blog-db (post-id a-post)))])
+         (if (> (length lst) 0)
+             (render-as-itemized-list lst)
+             (haml (:ul (:li (:h6 "no anything comment."))))))
        (:hr)
        (:h4 "New Comment Here:")
        (:form ([:action (embed/url insert-comment-handler)]
@@ -81,8 +85,8 @@
     (template "Blog" (page-name) body))
   
   (define (insert-comment-handler request)
-    (let* ([bindings (request-bindings request)]
-           [comment (extract-binding/single 'comment bindings)])
+    (let* ([bindings (request-bindings/raw request)]
+           [comment (bindings-ref bindings 'comment)])
       (cond
         [(valid-string? comment)
          (post-insert-comment! blog-db (post-id a-post) comment)
@@ -118,9 +122,9 @@
     (template "New Post" (page-name) body))
   
   (define (insert-post-handler req)
-    (let* ([bindings (request-bindings req)]
-           [title (extract-binding/single 'title bindings)]
-           [body (extract-binding/single 'body bindings)])
+    (let* ([bindings (request-bindings/raw req)]
+           [title (bindings-ref bindings 'title)]
+           [body (bindings-ref bindings 'body)])
       (cond
         [(and (valid-string? title)
               (valid-string? body))

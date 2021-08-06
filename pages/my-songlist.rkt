@@ -30,9 +30,9 @@
         (.col-auto
          (:select.form-select
           ([:name "music-platform"])
-          (:option ([:value "YQC"]) "酷狗")
-          (:option ([:value "migu"]
-                    [:selected ""]) "咪咕")
+          (:option ([:value "YQC"]
+                    [:selected ""]) "酷狗")
+          (:option ([:value "migu"]) "咪咕")
           (:option ([:value "YQB"]) "酷我")
           (:option ([:value "YQA"]) "网易")
           (:option ([:value "douban"]) "豆瓣")
@@ -42,6 +42,7 @@
         (.col-auto
          (:input.form-control
           ([:type "text"]
+           [:method "POST"]
            [:placeholder "Singer/Song Name"]
            [:name "text"])))
         (.col-auto
@@ -52,11 +53,11 @@
   
   (define (search-handler req)
     (let* ([bindings (request-bindings/raw req)]
-           [text (bindings-ref bindings 'text)]
-           [platform (bindings-ref bindings 'music-platform)])
+           [text (string-trim (bindings-ref bindings 'text))]
+           [platform (string-trim (bindings-ref bindings 'music-platform))])
       (if (and (non-empty-string? text)
                (non-empty-string? platform))
-          (search-result-page text platform 1 req)
+          (search-result-page text platform 1 (redirect/get))
           (occur-error-page "Search Error"
                             "Invalid search content"
                             (lambda (req)
@@ -87,31 +88,40 @@
   (define (response-generator embed/url)
     (define body
       (haml
-       (:h2 ([:sytle "color:green;"])
+       (:h2 ([:style "color:green;"])
             (string-append "「" text "」" " Search Result:"))
        (:div ([:id "lrc-panel"]) "FREE MUSIC PLAYER")
        (.list-group
         ,@(let* ([jsexp (music-search text platform page)]
-                 [items (hash-ref jsexp 'list)]
-                 [size (length items)]
-                 [more (string->number (hash-ref jsexp 'more))])
+                 [jsexp-size (length (hash-keys jsexp))])
             (cond
-              [(< 0 size)
-               (if (> more 0)
-                   (append
-                    (for/list ([item items])
-                      (render-item-list item))
-                    (list
-                     (haml
-                      (:a.btn.btn-primary
-                       ([:href (embed/url next-page-handler)])
-                       "Next"))))
-                   (for/list ([item items])
-                     (render-item-list item)))]
-              [else
+              [(<= jsexp-size 0)
                (haml
                 (.empty)
-                (:p ([:style "color:red;"]) "0 music found."))])))))
+                (:p ([:style "color: red;"]) "server error, please try again later."))]
+              [else
+               (let* ([items (hash-ref jsexp 'list)]
+                      [size (length items)]
+                      [more (if (> size 0)
+                                (string->number (hash-ref jsexp 'more))
+                                0)])
+                 (cond
+                   [(<= size 0)
+                    (haml
+                     (.empty)
+                     (:p ([:style "color:red;"]) "no music found."))]
+                   [(> more 0)
+                    (append
+                     (for/list ([item items])
+                       (render-item-list item))
+                     (list
+                      (haml
+                       (:a.btn.btn-primary
+                        ([:href (embed/url next-page-handler)])
+                        "Next"))))]
+                   [else
+                    (for/list ([item items])
+                      (render-item-list item))]))])))))
     (template (string-append "Search 「" text "」")
               "SONGS"
               body

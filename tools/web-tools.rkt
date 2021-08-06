@@ -21,7 +21,8 @@
 
 
 (define (valid-string? s)
-  (non-empty-string? s))
+  (and (string? s)
+       (non-empty-string? (string-trim s))))
 
 
 (define (datetime->normal-string dt)

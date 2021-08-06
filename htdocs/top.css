@@ -5,14 +5,8 @@
     }
 }
 
-html {
-    height: 100%;
-    padding-bottom: 4px;
-}
-
 body {
     margin: 2px;
-    height: 100%;
     border: 1px solid black;
     border-radius: 4px;
     padding-left: 6%;
@@ -29,7 +23,6 @@ p.content {
     white-space: pre-line;
 }
 h1 { color: #2f2f2f }
-/* span.hot { color: red } */
 
 div.post-link {
     color: #2f2fff;
@@ -44,18 +37,3 @@ div.post-comment-sum {
     font-size: 80%;
 }
 
-/* top-nav-bar */
-/*ul.nav.nav-pills {
-    box-shadow: -2px -1px 2px 1px rgba(46, 125, 255, 0.18);
-    border: 2px solid #2af;
-    border-radius: 2px;
-    padding-left: 20px;
-    padding-right: 20px;
-    padding-top: 4px;
-    padding-bottom: 4px;
-}
-.nav-pills .nav-link.active, .nav-pills .show>.nav-link {
-    color: #fff;
-    background-color: #666;
-}
-*/
