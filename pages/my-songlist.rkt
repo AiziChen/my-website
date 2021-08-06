@@ -122,18 +122,18 @@
                        ,@(cond
                            [(> page 1)
                             (haml
-                             (.d-grid.col-md-6
+                             (.d-grid.col-6
                               (:a.btn.btn-primary
                                ([:href (embed/url previous-page-handler)])
                                "Previous"))
-                             (.d-grid.col-md-6
+                             (.d-grid.col-6
                               (:a.btn.btn-primary
                                ([:href (embed/url next-page-handler)])
                                "Next")))]
                            [else
                             (haml
                              (.empty)
-                             (.d-grid.col-md-12
+                             (.d-grid.col-12
                               (:a.btn.btn-primary
                                ([:href (embed/url next-page-handler)])
                                "Next")))]))
