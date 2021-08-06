@@ -11,7 +11,7 @@ const playLyric = (player) => {
         if (howl.playing()) {
           lrcPanel.innerText = obj.text;
         }
-      }, obj.timestamp * 1000 - how.seek() * 1000);
+      }, obj.timestamp * 1000 - howl.seek() * 1000);
       timeoutArrs.push(toutFd);
     }
   }
