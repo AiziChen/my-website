@@ -3,9 +3,10 @@
 (require koyo/haml
          koyo/http
          xml
-         racket/string
          web-server/servlet
          web-server/http/bindings
+         racket/string
+         racket/format
          "template.rkt"
          "../tools/top-tools.rkt")
 
@@ -85,6 +86,8 @@
         (hash-ref item 'artist))))))
   (define (next-page-handler req)
     (search-result-page text platform (+ page 1) req))
+  (define (previous-page-handler req)
+    (search-result-page text platform (- page 1) req))
   (define (response-generator embed/url)
     (define body
       (haml
@@ -114,11 +117,27 @@
                     (append
                      (for/list ([item items])
                        (render-item-list item))
-                     (list
-                      (haml
-                       (:a.btn.btn-primary
-                        ([:href (embed/url next-page-handler)])
-                        "Next"))))]
+                     (haml
+                      (.row
+                       ,@(cond
+                           [(> page 1)
+                            (haml
+                             (.d-grid.col-md-6
+                              (:a.btn.btn-primary
+                               ([:href (embed/url previous-page-handler)])
+                               "Previous"))
+                             (.d-grid.col-md-6
+                              (:a.btn.btn-primary
+                               ([:href (embed/url next-page-handler)])
+                               "Next")))]
+                           [else
+                            (haml
+                             (.empty)
+                             (.d-grid.col-md-12
+                              (:a.btn.btn-primary
+                               ([:href (embed/url next-page-handler)])
+                               "Next")))]))
+                      (:h6 (~a "CURRENT PAGE: " page))))]
                    [else
                     (for/list ([item items])
                       (render-item-list item))]))])))))
