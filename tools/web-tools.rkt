@@ -2,13 +2,15 @@
 
 (require gregor
          web-server/http/response-structs
+         web-server/http/request-structs
          racket/string
          racket/format)
 
 
 (provide
  response/template valid-string?
- datetime->normal-string)
+ datetime->normal-string
+ response-redirect)
 
 
 (define response/template
@@ -37,3 +39,15 @@
       (->minutes dt)
       ":"
       (->seconds dt)))
+
+;;; Direct to the new location
+(define (response-redirect location)
+  (response
+   302
+   #"Found"
+   (current-seconds)
+   #"text/html; charset=utf-8"
+   (list (header #"Location" location))
+   (lambda (out)
+     (parameterize ([current-output-port out])
+       (displayln "")))))

@@ -13,6 +13,7 @@
  initialize-blog!
  blog-dbc
  blog-posts
+ blog-post
  blog-posts-in-page
  post-comments
  blog-insert-post!
@@ -44,39 +45,30 @@
   (sequence->list
    (in-entities blog-db
                 (~> (from post #:as p)
-                    (select _ (between p.id
-                                       ,(* each (- page 1))
-                                       ,(* each page)))))))
+                    (where _ (between p.id
+                                      ,(* each (- page 1))
+                                      ,(* each page)))))))
+(define (blog-post blog-db postid)
+  (lookup blog-db
+          (~> (from post #:as p)
+              (where (= p.id ,postid)))))
 
-(define (post-comments blog-db post-id)
+(define (post-comments blog-db postid)
   (sequence->list
    (in-entities blog-db
                 (~> (from comment #:as c)
-                    (where (= c.pid ,post-id))))))
+                    (where (= c.pid ,postid))))))
 
 (define (initialize-blog!)
   (define db blog-dbc)
   (unless (table-exists? db "posts")
     (create-table! db 'post)
-    #;
-    (query-exec db
-                (string-append
-                 "CREATE TABLE posts "
-                 "(id INTEGER PRIMARY KEY, title TEXT, body TEXT"
-                 ", created_at DATETIME DEFAULT CURRENT_TIMESTAMP"
-                 ", updated_at DATETIME DEFAULT CURRENT_TIMESTAMP)"))
     (blog-insert-post!
      db "First Post" "This is my first post.")
     (blog-insert-post!
      db "Second Post" "This is my second post"))
   (unless (table-exists? db "comments")
     (create-table! db 'comment)
-    #;
-    (query-exec db
-                (string-append "CREATE TABLE comments "
-                               "(pid INTEGER, content TEXT"
-                               ", created_at DATETIME DEFAULT CURRENT_TIMESTAMP"
-                               ", updated_at DATETIME DEFAULT CURRENT_TIMESTAMP)"))
     (post-insert-comment!
      db (post-id (car (blog-posts db))) "First Comment"))
   (disconnect db))
