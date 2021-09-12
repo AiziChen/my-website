@@ -2,6 +2,7 @@
 .idea
 .vscode
 compiled/
+static/posts
 
 #*
 *~

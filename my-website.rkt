@@ -3,7 +3,7 @@
 (require koyo/dispatch
          koyo/url
          koyo/cors
-;         web-server/servlet-env
+         koyo/static
          web-server/dispatch
          web-server/web-server
          web-server/servlet-dispatch
@@ -12,10 +12,8 @@
          "models/blog-model.rkt"
          "my-blog.rkt")
 
-(current-cors-origin "*")
-
 ;;; Dispatches
-(define-values (website-dispatch blog-url req-roles)
+(define-values (dispatch url roles)
   (dispatch-rules+roles
    [("api" "get-posts")
     get-posts]
@@ -29,12 +27,15 @@
     new-post]))
 
 
+(current-cors-origin "*")
+
 (define (stack handler)
   (wrap-cors handler))
 
 (define dispatchers
   (list
-   (dispatch/servlet (stack website-dispatch))))
+   (dispatch/servlet (stack dispatch))
+   (make-static-dispatcher "." "static")))
 
 (define stop
   (serve
