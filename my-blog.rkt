@@ -54,8 +54,8 @@
    (for/list ([comment (post-comments blog-dbc postid)])
      (hasheq 'content (comment-content comment)
              'pid (comment-pid comment)
-             'created_at (comment-created-at comment)
-             'updated_at (comment-updated-at comment)))))
+             'created_at (datetime->normal-string (comment-created-at comment))
+             'updated_at (datetime->normal-string (comment-updated-at comment))))))
 
 
 (define (new-post req)
