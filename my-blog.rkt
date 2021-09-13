@@ -6,12 +6,15 @@
          web-server/http/redirect
          json
          racket/format
+         racket/contract
+         racket/math
          "tools/top-tools.rkt"
          "tools/web-tools.rkt"
          "models/blog-model.rkt")
 
 (provide
  get-posts
+ get-post
  get-comments-by-post
 
  new-post)
@@ -22,7 +25,10 @@
 (initialize-blog!)
 
 
-(define (get-posts req [page #f])
+(define/contract (get-posts req [page #f])
+  (->* (request?)
+       (nonnegative-integer?)
+       response?)
   (define posts
     (cond
       [page
@@ -33,15 +39,23 @@
    (for/list ([post posts])
      (hasheq 'id (post-id post)
              'title (post-title post)
-             'body (post-body post)
              'created_at (datetime->normal-string (post-created-at post))
              'updated_at (datetime->normal-string (post-updated-at post))))))
+
+(define (get-post req post-id)
+  (define post (blog-post blog-dbc post-id))
+  (response/json
+   (hasheq 'title (post-title post)
+           'body (post-body post))))
 
 
 (define (get-comments-by-post req postid)
   (response/json
    (for/list ([comment (post-comments blog-dbc postid)])
-     (hasheq 'content (comment-content comment)))))
+     (hasheq 'content (comment-content comment)
+             'pid (comment-pid comment)
+             'created_at (comment-created-at comment)
+             'updated_at (comment-updated-at comment)))))
 
 
 (define (new-post req)
@@ -51,8 +65,9 @@
          [body (hash-ref jsexpr 'body #f)])
     (cond
       [(and title body)
-       (blog-insert-post! blog-dbc title body)
-       (response/json (hasheq 'status "ok"))]
+       (define post (blog-insert-post! blog-dbc title body))
+       (response/json (hasheq 'status "ok"
+                              'id (post-id post)))]
       [else
        (response/json (hasheq 'status "error"
                               'msg "parameter isn't correct"))])))

@@ -39,6 +39,7 @@
   (sequence->list
    (in-entities blog-db
                 (~> (from post #:as p)
+                    (select p.id p.title p.created_at p.updated_at)
                     (order-by ([p.id #:desc]))))))
 
 (define (blog-posts-in-page blog-db page #:each [each 10])
