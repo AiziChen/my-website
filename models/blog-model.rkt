@@ -9,6 +9,7 @@
 
 (provide
  (schema-out post)
+ (schema-out post-stats)
  (schema-out comment)
  initialize-blog!
  blog-dbc
@@ -27,6 +28,13 @@
    [[created-at (now)] datetime/f]
    [[updated-at (now)] datetime/f]))
 
+(define-schema post-stats
+  #:virtual
+  ([id id/f]
+   [title string/f]
+   [created-at datetime/f]
+   [updated-at datetime/f]))
+
 ;;; COMMENT MODEL
 (define-schema comment
   ([pid id/f]
@@ -34,21 +42,23 @@
    [[created-at (now)] datetime/f]
    [[updated-at (now)] datetime/f]))
 
-
 (define (blog-posts blog-db)
   (sequence->list
    (in-entities blog-db
                 (~> (from post #:as p)
                     (select p.id p.title p.created_at p.updated_at)
-                    (order-by ([p.id #:desc]))))))
+                    (order-by ([p.id #:desc]))
+                    (project-onto post-stats-schema)))))
 
 (define (blog-posts-in-page blog-db page #:each [each 10])
   (sequence->list
    (in-entities blog-db
                 (~> (from post #:as p)
+                    (select p.id p.title p.created_at p.updated_at)
                     (where _ (between p.id
                                       ,(* each (- page 1))
-                                      ,(* each page)))))))
+                                      ,(* each page)))
+                    (project-onto post-stats-schema)))))
 (define (blog-post blog-db postid)
   (lookup blog-db
           (~> (from post #:as p)

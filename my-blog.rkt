@@ -37,10 +37,10 @@
        (blog-posts blog-dbc)]))
   (response/json
    (for/list ([post posts])
-     (hasheq 'id (post-id post)
-             'title (post-title post)
-             'created_at (datetime->normal-string (post-created-at post))
-             'updated_at (datetime->normal-string (post-updated-at post))))))
+     (hasheq 'id (post-stats-id post)
+             'title (post-stats-title post)
+             'created_at (datetime->normal-string (post-stats-created-at post))
+             'updated_at (datetime->normal-string (post-stats-updated-at post))))))
 
 (define (get-post req post-id)
   (define post (blog-post blog-dbc post-id))
