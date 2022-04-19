@@ -89,8 +89,8 @@
   (virtual-connection
    (connection-pool
     (lambda ()
-      (postgresql-connect #:database "my-blog"
-                          #:user "coq"
+      (postgresql-connect #:database "my-website"
+                          #:user "postgres"
                           #:password "quanyec")))))
 
 ;; blog-insert-post!: blog post -> void

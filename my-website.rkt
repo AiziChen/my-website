@@ -49,7 +49,7 @@
   (serve
    #:dispatch (apply sequencer:make (filter-map values dispatchers))
    #:listen-ip #f
-   #:port 80))
+   #:port 8081))
 
 (with-handlers
   ([exn:break? (lambda (_) (stop))])
