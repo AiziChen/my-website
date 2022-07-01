@@ -20,9 +20,10 @@
          [courseware-id (hash-ref jsexpr 'coursewareId #f)]
          [user-id (hash-ref jsexpr 'userId #f)]
          [uname-sn (hash-ref jsexpr 'unameSN #f)]
-         [org-name (hash-ref jsexpr 'orgName #f)])
+         [org-name (hash-ref jsexpr 'orgName #f)]
+         [position (hash-ref jsexpr 'position #f)])
     (cond
-      [(and grade-id course-id courseware-id user-id uname-sn org-name)
+      [(and grade-id course-id courseware-id user-id uname-sn org-name position)
        (define res
          (post "http://media.lllnet.cn/media/reportCourseStudyProgress"
                #:form `((courseId . ,course-id)
@@ -30,7 +31,8 @@
                         (coursewareId . ,courseware-id)
                         (userId . ,user-id)
                         (unameSN . ,uname-sn)
-                        (orgName . ,org-name))))
+                        (orgName . ,org-name)
+                        (position . ,position))))
        (if (= (response-status-code res) 200)
            (response/json (response-json res))
            (response/json (hasheq 'status "error")))]
