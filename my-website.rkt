@@ -12,7 +12,8 @@
          racket/list
          "models/blog-model.rkt"
          "my-blog.rkt"
-         "my-drive.rkt")
+         "my-drive.rkt"
+         "lllnet.rkt")
 
 ;;; Dispatches
 (define-values (dispatch url roles)
@@ -32,7 +33,11 @@
     new-post]
 
    [("api" "get-drive-list")
-    show-drive-list]))
+    show-drive-list]
+
+   [("api" "lllnet-report-course-study-progress")
+    #:method "post"
+    lllnet-report-course-study-progress]))
 
 
 (current-cors-origin "*")
